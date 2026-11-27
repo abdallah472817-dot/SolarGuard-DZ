@@ -1,9 +1,9 @@
-"""Domain configuration: Algerian climatic atlas, facility presets, tariffs, and i18n."""
+"""Domain configuration: Algerian climatic atlas, facility presets, tariffs, and EN/FR/AR i18n."""
 
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict
+from typing import Dict, Optional
 
 
 @dataclass(frozen=True)
@@ -20,13 +20,17 @@ class WilayaProfile:
     avg_temp_winter_c: float
     soiling_risk: str  # Low, Moderate, High, Extreme
     base_soiling_rate_pct_day: float
+    name_ar: str = ""
+    zone_ar: str = ""
 
 
 WILAYAS_CATALOG: Dict[str, WilayaProfile] = {
     "Oran": WilayaProfile(
         code="31",
         name="Oran",
+        name_ar="وهران",
         zone="Mediterranean Coast",
+        zone_ar="الساحل المتوسطي الغربي",
         lat=35.697,
         lon=-0.630,
         elevation_m=101,
@@ -40,7 +44,9 @@ WILAYAS_CATALOG: Dict[str, WilayaProfile] = {
     "Algiers": WilayaProfile(
         code="16",
         name="Algiers (Alger)",
+        name_ar="الجزائر العاصمة",
         zone="Mediterranean Coast",
+        zone_ar="الساحل المتوسطي الأوسط",
         lat=36.753,
         lon=3.058,
         elevation_m=59,
@@ -54,7 +60,9 @@ WILAYAS_CATALOG: Dict[str, WilayaProfile] = {
     "Constantine": WilayaProfile(
         code="25",
         name="Constantine",
+        name_ar="قسنطينة",
         zone="Tell Atlas Inland",
+        zone_ar="الأطلس التلي الداخلي",
         lat=36.365,
         lon=6.614,
         elevation_m=694,
@@ -68,7 +76,9 @@ WILAYAS_CATALOG: Dict[str, WilayaProfile] = {
     "Annaba": WilayaProfile(
         code="23",
         name="Annaba",
+        name_ar="عنابة",
         zone="Eastern Coast",
+        zone_ar="الساحل الشرقي",
         lat=36.900,
         lon=7.767,
         elevation_m=18,
@@ -82,7 +92,9 @@ WILAYAS_CATALOG: Dict[str, WilayaProfile] = {
     "Setif": WilayaProfile(
         code="19",
         name="Sétif",
+        name_ar="سطيف",
         zone="High Plateaus",
+        zone_ar="الهضاب العليا الشرقية",
         lat=36.190,
         lon=5.410,
         elevation_m=1096,
@@ -96,7 +108,9 @@ WILAYAS_CATALOG: Dict[str, WilayaProfile] = {
     "Djelfa": WilayaProfile(
         code="17",
         name="Djelfa",
+        name_ar="الجلفة",
         zone="Steppe / High Plateaus",
+        zone_ar="السهوب والهضاب العليا",
         lat=34.670,
         lon=3.250,
         elevation_m=1144,
@@ -110,7 +124,9 @@ WILAYAS_CATALOG: Dict[str, WilayaProfile] = {
     "Biskra": WilayaProfile(
         code="07",
         name="Biskra",
+        name_ar="بسكرة",
         zone="Saharan Atlas Gateway",
+        zone_ar="بوابة الأطلس الصحراوي",
         lat=34.850,
         lon=5.728,
         elevation_m=124,
@@ -124,7 +140,9 @@ WILAYAS_CATALOG: Dict[str, WilayaProfile] = {
     "Bechar": WilayaProfile(
         code="08",
         name="Béchar",
+        name_ar="بشار",
         zone="Western Sahara",
+        zone_ar="الجنوب الغربي الصحراوي",
         lat=31.617,
         lon=-2.217,
         elevation_m=773,
@@ -138,7 +156,9 @@ WILAYAS_CATALOG: Dict[str, WilayaProfile] = {
     "Ghardaia": WilayaProfile(
         code="47",
         name="Ghardaïa",
+        name_ar="غرداية",
         zone="Northern Sahara (M'Zab)",
+        zone_ar="شمال الصحراء (وادي مزاب)",
         lat=32.491,
         lon=3.674,
         elevation_m=469,
@@ -152,7 +172,9 @@ WILAYAS_CATALOG: Dict[str, WilayaProfile] = {
     "Ouargla": WilayaProfile(
         code="30",
         name="Ouargla / Hassi Messaoud",
+        name_ar="ورقلة / حاسي مسعود",
         zone="Eastern Sahara Energy Basin",
+        zone_ar="الحوض الطاقوي الصحراوي الشرقي",
         lat=31.950,
         lon=5.325,
         elevation_m=141,
@@ -166,7 +188,9 @@ WILAYAS_CATALOG: Dict[str, WilayaProfile] = {
     "Adrar": WilayaProfile(
         code="01",
         name="Adrar",
+        name_ar="أدرار",
         zone="Grand Sud Sahara",
+        zone_ar="الجنوب الكبير الصحراوي",
         lat=27.874,
         lon=-0.293,
         elevation_m=263,
@@ -180,7 +204,9 @@ WILAYAS_CATALOG: Dict[str, WilayaProfile] = {
     "Tamanrasset": WilayaProfile(
         code="11",
         name="Tamanrasset",
+        name_ar="تمنراست",
         zone="Hoggar Highlands",
+        zone_ar="مرتفعات الهقار",
         lat=22.785,
         lon=5.523,
         elevation_m=1378,
@@ -208,6 +234,7 @@ class FacilityPreset:
     base_load_kw: float
     peak_load_kw: float
     load_profile_type: str  # industrial, commercial, hospital, microgrid, utility
+    label_ar: str = ""
 
 
 FACILITY_PRESETS: Dict[str, FacilityPreset] = {
@@ -215,6 +242,7 @@ FACILITY_PRESETS: Dict[str, FacilityPreset] = {
         key="oran_industrial",
         label_en="Oran Industrial Plant (250 kWp + 300 kWh ESS)",
         label_fr="Usine Industrielle d'Oran (250 kWc + 300 kWh BESS)",
+        label_ar="المصنع الصناعي بوهران (250 kWp + 300 kWh بطاريات)",
         wilaya="Oran",
         sector="Industrial Manufacturing",
         pv_capacity_kwp=250.0,
@@ -229,6 +257,7 @@ FACILITY_PRESETS: Dict[str, FacilityPreset] = {
         key="ghardaia_microgrid",
         label_en="Ghardaïa Hybrid Solar Microgrid (150 kWp + 400 kWh ESS)",
         label_fr="Micro-réseau Hybride Ghardaïa (150 kWc + 400 kWh BESS)",
+        label_ar="الشبكة المصغرة الهجينة بغرداية (150 kWp + 400 kWh بطاريات)",
         wilaya="Ghardaia",
         sector="Remote Microgrid / Agro-Pumping",
         pv_capacity_kwp=150.0,
@@ -243,6 +272,7 @@ FACILITY_PRESETS: Dict[str, FacilityPreset] = {
         key="adrar_utility",
         label_en="Adrar Saharan Solar Feeder (1,200 kWp + 800 kWh ESS)",
         label_fr="Centrale Solaire d'Adrar (1 200 kWc + 800 kWh BESS)",
+        label_ar="محطة أدرار الشمسية الصحراوية (1,200 kWp + 800 kWh بطاريات)",
         wilaya="Adrar",
         sector="Utility / Oil & Gas Camp Feeder",
         pv_capacity_kwp=1200.0,
@@ -257,6 +287,7 @@ FACILITY_PRESETS: Dict[str, FacilityPreset] = {
         key="algiers_campus",
         label_en="Algiers Tech & Office Campus (85 kWp + 120 kWh ESS)",
         label_fr="Campus Tertiaire d'Alger (85 kWc + 120 kWh BESS)",
+        label_ar="المجمع التكنولوجي والإداري بالجزائر (85 kWp + 120 kWh بطاريات)",
         wilaya="Algiers",
         sector="Commercial / Tertiary",
         pv_capacity_kwp=85.0,
@@ -271,6 +302,7 @@ FACILITY_PRESETS: Dict[str, FacilityPreset] = {
         key="constantine_hospital",
         label_en="Constantine Healthcare Complex (320 kWp + 500 kWh ESS)",
         label_fr="Complexe Hospitalier Constantine (320 kWc + 500 kWh BESS)",
+        label_ar="المركب الاستشفائي بقسنطينة (320 kWp + 500 kWh بطاريات)",
         wilaya="Constantine",
         sector="Critical Healthcare 24/7",
         pv_capacity_kwp=320.0,
@@ -298,6 +330,7 @@ class TariffScheme:
     demand_charge_per_kw_month: float
     default_pv_capex_per_kwp: float
     default_ess_capex_per_kwh: float
+    name_ar: str = ""
 
 
 TARIFF_PROFILES: Dict[str, TariffScheme] = {
@@ -305,6 +338,7 @@ TARIFF_PROFILES: Dict[str, TariffScheme] = {
         key="sonelgaz_mt_tou",
         name_en="Sonelgaz Medium-Voltage ToU (DZD)",
         name_fr="Sonelgaz Moyenne Tension HPH/HPL (DZD)",
+        name_ar="سونلغاز التوتر المتوسط حسب الفترات (DZD)",
         currency="DZD",
         symbol="DA",
         off_peak_rate=2.45,
@@ -319,6 +353,7 @@ TARIFF_PROFILES: Dict[str, TariffScheme] = {
         key="sonelgaz_bt_comm",
         name_en="Sonelgaz Low-Voltage Commercial/Pro (DZD)",
         name_fr="Sonelgaz Basse Tension Pro/Tertiaire (DZD)",
+        name_ar="سونلغاز التوتر المنخفض تجاري / مهني (DZD)",
         currency="DZD",
         symbol="DA",
         off_peak_rate=4.18,
@@ -333,6 +368,7 @@ TARIFF_PROFILES: Dict[str, TariffScheme] = {
         key="intl_usd_tou",
         name_en="International C&I Time-of-Use (USD)",
         name_fr="Tarif C&I International (USD)",
+        name_ar="التعريفة الصناعية والتجارية الدولية (USD)",
         currency="USD",
         symbol="$",
         off_peak_rate=0.085,
@@ -347,6 +383,7 @@ TARIFF_PROFILES: Dict[str, TariffScheme] = {
         key="med_eur_tou",
         name_en="Euro-Med Industrial Benchmark (EUR)",
         name_fr="Référence Industrielle Euro-Med (EUR)",
+        name_ar="المرجع الصناعي الأورومتوسطي (EUR)",
         currency="EUR",
         symbol="€",
         off_peak_rate=0.105,
@@ -410,16 +447,66 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "tariff_profile": "Tarification & Devise",
         "active_site": "Site Actif",
     },
+    "ar": {
+        "app_subtitle": "تحليلات الطاقة، تشخيص الأنظمة الكهروضوئية وتحسين الشبكات المصغرة",
+        "nav_overview": "النظرة التنفيذية والأطلس",
+        "nav_pv": "أداء الطاقة الشمسية والتشخيص",
+        "nav_load": "تحليل الحمل الكهربائي والشبكة",
+        "nav_forecast": "التنبؤ الذكي ومحاكاة البطاريات",
+        "nav_econ": "العائد المالي والبصمة الكربونية",
+        "nav_data": "استوديو البيانات والتصدير",
+        "sidebar_data_source": "مصدر البيانات والمنشأة",
+        "mode_preset": "منشأة جزائرية محاكاة",
+        "mode_upload": "رفع ملف CSV / Excel",
+        "date_window": "فترة التحليل الزمنية",
+        "tariff_profile": "التعريفة والعملة",
+        "active_site": "الموقع النشط",
+    },
 }
 
 
 def tr(lang: str, key: str) -> str:
-    """Translate UI string for active language ('en' or 'fr')."""
+    """Translate UI string for active language ('en', 'fr', or 'ar')."""
     lang_dict = TRANSLATIONS.get(lang, TRANSLATIONS["en"])
     return lang_dict.get(key, TRANSLATIONS["en"].get(key, key))
 
 
-def bi(lang: str, en_text: str, fr_text: str) -> str:
-    """Inline bilingual selector ('fr' -> French, otherwise English)."""
-    return fr_text if lang == "fr" else en_text
+def bi(lang: str, en_text: str, fr_text: str, ar_text: Optional[str] = None) -> str:
+    """Inline trilingual selector ('ar' -> Arabic, 'fr' -> French, otherwise English)."""
+    if lang == "ar":
+        return ar_text if ar_text is not None else en_text
+    if lang == "fr":
+        return fr_text
+    return en_text
 
+
+def wilaya_display_name(w: WilayaProfile, lang: str) -> str:
+    """Return localized Wilaya display name."""
+    if lang == "ar" and w.name_ar:
+        return w.name_ar
+    return w.name
+
+
+def wilaya_zone_name(w: WilayaProfile, lang: str) -> str:
+    """Return localized Wilaya climatic zone description."""
+    if lang == "ar" and w.zone_ar:
+        return w.zone_ar
+    return w.zone
+
+
+def preset_display_label(p: FacilityPreset, lang: str) -> str:
+    """Return localized facility preset label."""
+    if lang == "ar" and p.label_ar:
+        return p.label_ar
+    if lang == "fr":
+        return p.label_fr
+    return p.label_en
+
+
+def tariff_display_name(t: TariffScheme, lang: str) -> str:
+    """Return localized tariff scheme name."""
+    if lang == "ar" and t.name_ar:
+        return t.name_ar
+    if lang == "fr":
+        return t.name_fr
+    return t.name_en

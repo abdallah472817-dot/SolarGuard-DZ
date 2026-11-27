@@ -71,6 +71,15 @@ def test_french_semicolon_csv_and_unmapped_fallback():
     norm_obs, _ = normalize_custom_dataset(obscure, {"timestamp": "Date_Ref"})
     assert np.allclose(norm_obs["load_kw"], 112.5)
 
+    # Arabic CSV column auto-detection
+    ar_df = pd.DataFrame({"التاريخ": ts, "الاستهلاك": 95.0, "الطاقة_الشمسية": 40.0})
+    ar_map = auto_detect_mapping(list(ar_df.columns))
+    assert ar_map["timestamp"] == "التاريخ"
+    assert ar_map["load_kw"] == "الاستهلاك"
+    assert ar_map["pv_ac_kw"] == "الطاقة_الشمسية"
+    norm_ar, _ = normalize_custom_dataset(ar_df, ar_map)
+    assert len(norm_ar) == 72
+
 
 def test_daily_csv_disaggregates_cleanly_without_night_pv():
     days = pd.date_range("2026-07-01", periods=10, freq="1D")
@@ -181,6 +190,7 @@ def test_all_16_plotly_charts_serialize_to_json():
         chart_energy_balance_timeline(resample_energy_frame(df, "1D"), "1D"),
         chart_energy_sankey(kpis),
         chart_algeria_solar_map("Oran"),
+        chart_algeria_solar_map("Oran", lang="ar"),
         chart_pv_waterfall(wf),
         chart_irradiance_power_curve(anom["annotated_df"]),
         chart_anomaly_timeline(anom["annotated_df"]),

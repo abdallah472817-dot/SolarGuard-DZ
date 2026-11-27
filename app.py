@@ -20,9 +20,8 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-inject_custom_css()
-
 lang_curr = st.session_state.get("sg_lang") or "en"
+inject_custom_css(lang=lang_curr)
 
 
 def page_overview() -> None:

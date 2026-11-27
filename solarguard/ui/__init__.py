@@ -1,4 +1,4 @@
-"""Shared Streamlit UI context, caching wrappers, and sidebar orchestration."""
+"""Shared Streamlit UI context, caching wrappers, and trilingual (EN/FR/AR) sidebar orchestration."""
 
 from __future__ import annotations
 
@@ -15,7 +15,11 @@ from solarguard.config import (
     TARIFF_PROFILES,
     WILAYAS_CATALOG,
     TariffScheme,
+    bi,
+    preset_display_label,
+    tariff_display_name,
     tr,
+    wilaya_display_name,
 )
 from solarguard.data_generator import generate_facility_telemetry
 from solarguard.data_loader import (
@@ -26,6 +30,7 @@ from solarguard.data_loader import (
 from solarguard.forecasting import run_energy_forecast
 from solarguard.ui.theme import (
     inject_custom_css,
+    inject_rtl_css,
     render_page_banner,
     render_section_header,
     render_sidebar_brand,
@@ -34,6 +39,7 @@ from solarguard.ui.theme import (
 __all__ = [
     "AppContext",
     "inject_custom_css",
+    "inject_rtl_css",
     "render_page_banner",
     "render_section_header",
     "render_sidebar_brand",
@@ -42,6 +48,15 @@ __all__ = [
     "cached_run_forecast",
     "build_sidebar_and_context",
 ]
+
+WINDOW_PRESET_LABELS = {
+    "Full Dataset": ("Full Dataset", "Jeu Complet", "كامل البيانات"),
+    "Q1 (Jan–Mar)": ("Q1 (Jan–Mar)", "T1 (Jan–Mar)", "الربع 1 (يناير–مارس)"),
+    "Q2 (Apr–Jun)": ("Q2 (Apr–Jun)", "T2 (Avr–Juin)", "الربع 2 (أبريل–يونيو)"),
+    "Q3 Peak Summer (Jul–Sep)": ("Q3 Peak Summer (Jul–Sep)", "T3 Été (Juil–Sep)", "الربع 3 ذروة الصيف (يوليو–سبتمبر)"),
+    "Q4 (Oct–Dec)": ("Q4 (Oct–Dec)", "T4 (Oct–Déc)", "الربع 4 (أكتوبر–ديسمبر)"),
+    "Custom Date Range": ("Custom Date Range", "Plage Personnalisée", "نطاق زمني مخصص"),
+}
 
 
 @dataclass
@@ -93,16 +108,19 @@ def build_sidebar_and_context() -> AppContext:
     """Render shared sidebar controls and return active dataset + computed KPIs."""
     with st.sidebar:
         active_lang_hint = st.session_state.get("sg_lang") or "en"
-        render_sidebar_brand(tr(active_lang_hint, "app_subtitle"))
+        render_sidebar_brand(tr(active_lang_hint, "app_subtitle"), lang=active_lang_hint)
 
         lang = st.radio(
-            "Language / Langue",
-            options=["en", "fr"],
-            format_func=lambda k: "🇬🇧 English" if k == "en" else "🇫🇷 Français",
+            "Language / Langue / اللغة",
+            options=["en", "fr", "ar"],
+            format_func=lambda k: {"en": "English", "fr": "Français", "ar": "العربية"}.get(k, k),
             horizontal=True,
             key="sg_lang",
             label_visibility="collapsed",
         )
+        if lang == "ar":
+            inject_rtl_css()
+
         st.divider()
 
         st.markdown(
@@ -121,11 +139,9 @@ def build_sidebar_and_context() -> AppContext:
         if source_mode == "preset":
             preset_keys = list(FACILITY_PRESETS.keys())
             sel_preset_key = st.selectbox(
-                "Facility Profile" if lang == "en" else "Profil du Site",
+                bi(lang, "Facility Profile", "Profil du Site", "ملف المنشأة"),
                 options=preset_keys,
-                format_func=lambda k: (
-                    FACILITY_PRESETS[k].label_en if lang == "en" else FACILITY_PRESETS[k].label_fr
-                ),
+                format_func=lambda k: preset_display_label(FACILITY_PRESETS[k], lang),
                 key="sg_preset_key",
             )
             preset = FACILITY_PRESETS[sel_preset_key]
@@ -133,31 +149,34 @@ def build_sidebar_and_context() -> AppContext:
             wilaya_keys = list(WILAYAS_CATALOG.keys())
             default_w_idx = wilaya_keys.index(preset.wilaya) if preset.wilaya in wilaya_keys else 0
             sel_wilaya = st.selectbox(
-                "Climatic Wilaya (Solar Atlas)" if lang == "en" else "Wilaya Climatique (Atlas Solaire)",
+                bi(
+                    lang,
+                    "Climatic Wilaya (Solar Atlas)",
+                    "Wilaya Climatique (Atlas Solaire)",
+                    "الولاية المناخية (الأطلس الشمسي)",
+                ),
                 options=wilaya_keys,
                 index=default_w_idx,
-                format_func=lambda k: f"{WILAYAS_CATALOG[k].code} - {WILAYAS_CATALOG[k].name}",
+                format_func=lambda k: f"{WILAYAS_CATALOG[k].code} - {wilaya_display_name(WILAYAS_CATALOG[k], lang)}",
                 key=f"sg_wilaya_{sel_preset_key}",
             )
 
             full_df = cached_generate_telemetry(sel_preset_key, sel_wilaya)
-            site_label = (
-                preset.label_en.split("(")[0].strip() if lang == "en" else preset.label_fr.split("(")[0].strip()
-            )
+            site_label = preset_display_label(preset, lang).split("(")[0].strip()
             sector_label = preset.sector
             pv_kwp = preset.pv_capacity_kwp
             batt_kwh = preset.battery_capacity_kwh
             batt_kw = preset.battery_max_kw
         else:
             uploaded = st.file_uploader(
-                "CSV / Excel (.xlsx)",
+                bi(lang, "CSV / Excel (.xlsx)", "CSV / Excel (.xlsx)", "ملف CSV / Excel (.xlsx)"),
                 type=["csv", "xlsx", "xls"],
                 key="sg_uploader",
             )
             sel_wilaya = st.selectbox(
-                "Reference Wilaya Climate" if lang == "en" else "Wilaya de Référence",
+                bi(lang, "Reference Wilaya Climate", "Wilaya de Référence", "الولاية المرجعية للمناخ"),
                 options=list(WILAYAS_CATALOG.keys()),
-                format_func=lambda k: f"{WILAYAS_CATALOG[k].code} - {WILAYAS_CATALOG[k].name}",
+                format_func=lambda k: f"{WILAYAS_CATALOG[k].code} - {wilaya_display_name(WILAYAS_CATALOG[k], lang)}",
                 key="sg_upload_wilaya",
             )
             if uploaded is not None:
@@ -166,39 +185,55 @@ def build_sidebar_and_context() -> AppContext:
                     auto_map = auto_detect_mapping(list(raw_df.columns))
                     cols_with_none = [None] + list(raw_df.columns)
 
-                    with st.expander("Column Mapping & Units", expanded=False):
+                    with st.expander(
+                        bi(lang, "Column Mapping & Units", "Correspondance des Colonnes", "ربط الأعمدة والوحدات"),
+                        expanded=False,
+                    ):
                         ts_col = st.selectbox(
-                            "Timestamp Column",
+                            bi(lang, "Timestamp Column", "Colonne Horodatage", "عمود التاريخ والوقت"),
                             options=list(raw_df.columns),
                             index=list(raw_df.columns).index(auto_map["timestamp"])
                             if auto_map["timestamp"] in raw_df.columns
                             else 0,
                         )
                         ld_col = st.selectbox(
-                            "Load / Consumption Column",
+                            bi(lang, "Load / Consumption Column", "Colonne Consommation", "عمود الاستهلاك الكهربائي"),
                             options=cols_with_none,
                             index=cols_with_none.index(auto_map["load_kw"])
                             if auto_map["load_kw"] in cols_with_none
                             else 0,
                         )
                         pv_col = st.selectbox(
-                            "Solar PV Power Column",
+                            bi(lang, "Solar PV Power Column", "Colonne Production PV", "عمود إنتاج الطاقة الشمسية"),
                             options=cols_with_none,
                             index=cols_with_none.index(auto_map["pv_ac_kw"])
                             if auto_map["pv_ac_kw"] in cols_with_none
                             else 0,
                         )
                         irr_col = st.selectbox(
-                            "Irradiance (W/m²) Column",
+                            bi(lang, "Irradiance (W/m²) Column", "Colonne Irradiance (W/m²)", "عمود الإشعاع الشمسي (W/m²)"),
                             options=cols_with_none,
                             index=cols_with_none.index(auto_map["irradiance_wm2"])
                             if auto_map["irradiance_wm2"] in cols_with_none
                             else 0,
                         )
-                        unit_label = st.selectbox("Power Unit", ["kW / kWh", "W / Wh (÷1000)", "MW / MWh (×1000)"])
+                        unit_label = st.selectbox(
+                            bi(lang, "Power Unit", "Unité de Puissance", "وحدة القدرة"),
+                            ["kW / kWh", "W / Wh (÷1000)", "MW / MWh (×1000)"],
+                        )
                         unit_mult = 0.001 if "W /" in unit_label else (1000.0 if "MW" in unit_label else 1.0)
-                        user_kwp = st.number_input("Installed PV (kWp, 0 = auto)", min_value=0.0, value=0.0, step=10.0)
-                        user_ess = st.number_input("Battery ESS (kWh)", min_value=0.0, value=0.0, step=25.0)
+                        user_kwp = st.number_input(
+                            bi(lang, "Installed PV (kWp, 0 = auto)", "PV Installé (kWc, 0 = auto)", "قدرة الألواح (kWp، 0 = تلقائي)"),
+                            min_value=0.0,
+                            value=0.0,
+                            step=10.0,
+                        )
+                        user_ess = st.number_input(
+                            bi(lang, "Battery ESS (kWh)", "Batterie BESS (kWh)", "سعة البطارية (kWh)"),
+                            min_value=0.0,
+                            value=0.0,
+                            step=25.0,
+                        )
 
                     user_map = {
                         "timestamp": ts_col,
@@ -223,23 +258,40 @@ def build_sidebar_and_context() -> AppContext:
                     batt_kwh = user_ess
                     batt_kw = user_ess * 0.5
                     is_custom = True
-                    st.success(f"Loaded {meta['hourly_rows']:,} hourly rows ({meta['completeness_pct']}% valid).")
+                    st.success(
+                        bi(
+                            lang,
+                            f"Loaded {meta['hourly_rows']:,} hourly rows ({meta['completeness_pct']}% valid).",
+                            f"{meta['hourly_rows']:,} lignes horaires chargées ({meta['completeness_pct']}% valides).",
+                            f"تم تحميل {meta['hourly_rows']:,} سجل ساعي ({meta['completeness_pct']}% مكتمل).",
+                        )
+                    )
                 except Exception as exc:
-                    st.error(f"Upload parse error: {exc}. Showing Oran reference dataset.")
+                    st.error(
+                        bi(
+                            lang,
+                            f"Upload parse error: {exc}. Showing Oran reference dataset.",
+                            f"Erreur de lecture : {exc}. Affichage du site d'Oran.",
+                            f"خطأ في قراءة الملف: {exc}. يتم عرض بيانات وهران المرجعية.",
+                        )
+                    )
                     full_df = cached_generate_telemetry("oran_industrial", sel_wilaya)
-                    site_label = "Oran Industrial Plant (Fallback)"
+                    site_label = bi(lang, "Oran Industrial Plant", "Usine Industrielle d'Oran", "المصنع الصناعي بوهران")
                     sector_label = "Industrial Manufacturing"
                     pv_kwp = 250.0
                     batt_kwh = 300.0
                     batt_kw = 120.0
             else:
                 st.info(
-                    "Upload any CSV/XLSX above, or explore with the active Oran dataset."
-                    if lang == "en"
-                    else "Importez un fichier CSV/XLSX ci-dessus, ou explorez le jeu de données d'Oran."
+                    bi(
+                        lang,
+                        "Upload any CSV/XLSX above, or explore with the active Oran dataset.",
+                        "Importez un fichier CSV/XLSX ci-dessus, ou explorez le jeu de données d'Oran.",
+                        "ارفع ملف CSV أو Excel أعلاه، أو استكشف المنصة عبر بيانات وهران المرجعية.",
+                    )
                 )
                 full_df = cached_generate_telemetry("oran_industrial", sel_wilaya)
-                site_label = "Oran Industrial Plant"
+                site_label = bi(lang, "Oran Industrial Plant", "Usine Industrielle d'Oran", "المصنع الصناعي بوهران")
                 sector_label = "Industrial Manufacturing"
                 pv_kwp = 250.0
                 batt_kwh = 300.0
@@ -255,21 +307,15 @@ def build_sidebar_and_context() -> AppContext:
 
         window_preset = st.selectbox(
             "Period Preset",
-            options=[
-                "Full Dataset",
-                "Q1 (Jan–Mar)",
-                "Q2 (Apr–Jun)",
-                "Q3 Peak Summer (Jul–Sep)",
-                "Q4 (Oct–Dec)",
-                "Custom Date Range",
-            ],
+            options=list(WINDOW_PRESET_LABELS.keys()),
+            format_func=lambda opt: bi(lang, *WINDOW_PRESET_LABELS[opt]),
             key="sg_window_preset",
             label_visibility="collapsed",
         )
 
         if window_preset == "Custom Date Range":
             date_sel = st.date_input(
-                "Select Range",
+                bi(lang, "Select Range", "Sélectionner la Période", "اختر النطاق الزمني"),
                 value=(min_date, max_date),
                 min_value=min_date,
                 max_value=max_date,
@@ -295,7 +341,14 @@ def build_sidebar_and_context() -> AppContext:
 
         if len(filtered_df) < 24:
             if window_preset != "Full Dataset":
-                st.caption("⚠️ Selected window has <24h in dataset; showing full dataset.")
+                st.caption(
+                    bi(
+                        lang,
+                        "⚠️ Selected window has <24h in dataset; showing full dataset.",
+                        "⚠️ La période choisie contient <24h ; affichage complet.",
+                        "⚠️ الفترة المختارة أقل من 24 ساعة؛ يتم عرض كامل البيانات.",
+                    )
+                )
             filtered_df = full_df
 
         st.markdown(
@@ -306,9 +359,7 @@ def build_sidebar_and_context() -> AppContext:
         sel_tariff_key = st.selectbox(
             "Tariff",
             options=tariff_keys,
-            format_func=lambda k: (
-                TARIFF_PROFILES[k].name_en if lang == "en" else TARIFF_PROFILES[k].name_fr
-            ),
+            format_func=lambda k: tariff_display_name(TARIFF_PROFILES[k], lang),
             key="sg_tariff_key",
             label_visibility="collapsed",
         )
@@ -316,11 +367,12 @@ def build_sidebar_and_context() -> AppContext:
 
         t_start = filtered_df["timestamp"].min().strftime("%Y-%m-%d")
         t_end = filtered_df["timestamp"].max().strftime("%Y-%m-%d")
+        active_lbl = bi(lang, "telemetry active", "mesures actives", "ساعة قياس نشطة")
         st.markdown(
             f"""
             <div class="sg-sb-status">
-                <strong style="color:#F8FAFC;">{len(filtered_df):,} h</strong> telemetry active<br/>
-                <span style="color:#94A3B8;">{t_start} → {t_end}</span>
+                <strong style="color:#F8FAFC;"><span class="sg-ltr">{len(filtered_df):,} h</span></strong> {active_lbl}<br/>
+                <span style="color:#94A3B8;" class="sg-ltr">{t_start} → {t_end}</span>
             </div>
             """,
             unsafe_allow_html=True,

@@ -14,9 +14,13 @@ def test_app_entrypoint_language_and_sidebar_controls():
     assert len(at.exception) == 0, f"Entrypoint exception: {at.exception}"
     assert len(at.metric) >= 6
 
-    # Switch language to French and verify clean rerun
+    # Switch language to French and Arabic and verify clean reruns
     at.radio(key="sg_lang").set_value("fr").run()
     assert len(at.exception) == 0
+
+    at.radio(key="sg_lang").set_value("ar").run()
+    assert len(at.exception) == 0
+    assert any("إنتاج الطاقة الشمسية" in m.label for m in at.metric)
 
     # Switch facility preset & tariff currency
     at.selectbox(key="sg_preset_key").select("ghardaia_microgrid").run()
@@ -59,8 +63,8 @@ def _run_view_script():
     dispatch[view_name](ctx)
 
 
-def test_every_single_page_view_renders_cleanly_en_and_fr():
-    for lang in ("en", "fr"):
+def test_every_single_page_view_renders_cleanly_en_fr_and_ar():
+    for lang in ("en", "fr", "ar"):
         for view_key in ("overview", "pv_guard", "load_grid", "forecast_sim", "economics", "data_studio"):
             at = AppTest.from_function(_run_view_script, default_timeout=45)
             at.session_state["sg_lang"] = lang

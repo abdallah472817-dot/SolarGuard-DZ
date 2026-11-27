@@ -27,18 +27,20 @@ def render_forecast_sim_page(ctx: AppContext) -> None:
             lg,
             "ML Energy Forecasting & Interactive PV + Battery ESS Simulator",
             "Prévision IA Quantile & Simulateur de Dimensionnement PV + BESS",
+            "التنبؤ الذكي بالطاقة ومختبر تحجيم الألواح الشمسية والبطاريات",
         ),
         subtitle=bi(
             lg,
             "Strictly causal quantile HistGradientBoosting forecasts (P10/P50/P90) and prescriptive microgrid sizing lab.",
             "Modèles Gradient Boosting Quantiles strictement causaux (P10/P50/P90) et laboratoire de dimensionnement.",
+            "نماذج التعلم الآلي الاحتمالية السببية (P10/P50/P90) ومحاكاة التصميم الأمثل للشبكة المصغرة وتخزين البطاريات.",
         ),
     )
 
     tab_fc, tab_sim = st.tabs(
         [
-            bi(lg, "🤖 ML Short-Term Forecaster", "🤖 Prévision IA Court-Terme"),
-            bi(lg, "🔋 PV + Battery ESS Sizing Lab", "🔋 Dimensionnement PV + Batterie"),
+            bi(lg, "🤖 ML Short-Term Forecaster", "🤖 Prévision IA Court-Terme", "🤖 التنبؤ الذكي قصير المدى"),
+            bi(lg, "🔋 PV + Battery ESS Sizing Lab", "🔋 Dimensionnement PV + Batterie", "🔋 مختبر تحجيم الألواح والبطاريات"),
         ]
     )
 
@@ -46,19 +48,24 @@ def render_forecast_sim_page(ctx: AppContext) -> None:
         c_tgt, c_hor = st.columns([0.55, 0.45])
         with c_tgt:
             target_col = st.radio(
-                bi(lg, "Forecast Target", "Série Cible"),
+                bi(lg, "Forecast Target", "Série Cible", "المتغير المستهدف للتنبؤ"),
                 options=["load_kw", "pv_ac_kw"],
                 format_func=lambda c: (
-                    bi(lg, "Electrical Load (kW)", "Charge Électrique (kW)")
+                    bi(lg, "Electrical Load (kW)", "Charge Électrique (kW)", "الحمل الكهربائي (kW)")
                     if c == "load_kw"
-                    else bi(lg, "Solar PV Output (kW)", "Production Solaire PV (kW)")
+                    else bi(lg, "Solar PV Output (kW)", "Production Solaire PV (kW)", "إنتاج الطاقة الشمسية (kW)")
                 ),
                 horizontal=True,
                 key="fc_target_radio",
             )
         with c_hor:
             horizon_h = st.select_slider(
-                bi(lg, "Ahead Forecast Horizon (Hours)", "Horizon de Prévision (Heures)"),
+                bi(
+                    lg,
+                    "Ahead Forecast Horizon (Hours)",
+                    "Horizon de Prévision (Heures)",
+                    "أفق التنبؤ المستقبلي (بالساعات)",
+                ),
                 options=[24, 48, 72, 120, 168],
                 value=72,
                 key="fc_horizon_slider",
@@ -70,6 +77,7 @@ def render_forecast_sim_page(ctx: AppContext) -> None:
                     lg,
                     "Select at least 48 hours of data in the sidebar to train the ML forecaster.",
                     "Sélectionnez au moins 48 heures de données pour entraîner le modèle de prévision.",
+                    "يرجى اختيار 48 ساعة من البيانات على الأقل لتدريب نموذج التنبؤ الذكي.",
                 )
             )
         else:
@@ -82,7 +90,6 @@ def render_forecast_sim_page(ctx: AppContext) -> None:
             total_fut_kwh = float(fut_df["forecast_p50"].sum())
             peak_fut_kw = float(fut_df["forecast_p50"].max())
 
-            # Expected Net Grid Balance across forecast horizon
             net_grid_fut = np.maximum(
                 fc_load["forecast_df"]["forecast_p50"].to_numpy()
                 - fc_pv["forecast_df"]["forecast_p50"].to_numpy(),
@@ -92,22 +99,35 @@ def render_forecast_sim_page(ctx: AppContext) -> None:
 
             k1, k2, k3, k4, k5 = st.columns(5)
             k1.metric(
-                bi(lg, "Causal Holdout R²", "R² Validation Causale"),
+                bi(lg, "Causal Holdout R²", "R² Validation Causale", "معامل التحديد السببي R²"),
                 f"{m['r2']:.3f}",
                 delta=f"{m['holdout_hours']}h holdout",
             )
-            k2.metric("Holdout MAE", f"{m['mae']:.2f} kW", delta=f"{m['nmae_pct']:.1f}% nMAE", delta_color="off")
-            k3.metric("Holdout RMSE", f"{m['rmse']:.2f} kW")
+            k2.metric(
+                bi(lg, "Holdout MAE", "MAE Validation", "متوسط الخطأ المطلق MAE"),
+                f"{m['mae']:.2f} kW",
+                delta=f"{m['nmae_pct']:.1f}% nMAE",
+                delta_color="off",
+            )
+            k3.metric(
+                bi(lg, "Holdout RMSE", "RMSE Validation", "جذر متوسط مربع الخطأ RMSE"),
+                f"{m['rmse']:.2f} kW",
+            )
             k4.metric(
-                bi(lg, f"Next {horizon_h}h Target", f"Prévision {horizon_h}h"),
+                bi(lg, f"Next {horizon_h}h Target", f"Prévision {horizon_h}h", f"توقع {horizon_h} ساعة القادمة"),
                 f"{total_fut_kwh:,.0f} kWh",
                 delta=f"Peak {peak_fut_kw:,.1f} kW",
                 delta_color="off",
             )
             k5.metric(
-                bi(lg, f"Expected Net Grid ({horizon_h}h)", f"Import Réseau Prévu ({horizon_h}h)"),
+                bi(
+                    lg,
+                    f"Expected Net Grid ({horizon_h}h)",
+                    f"Import Réseau Prévu ({horizon_h}h)",
+                    f"صافي استيراد الشبكة المتوقع ({horizon_h}h)",
+                ),
                 f"{expected_net_import_kwh:,.0f} kWh",
-                delta=bi(lg, "Load − PV balance", "Bilan Charge − PV"),
+                delta=bi(lg, "Load − PV balance", "Bilan Charge − PV", "ميزان الحمل − الشمس"),
                 delta_color="off",
             )
 
@@ -119,6 +139,7 @@ def render_forecast_sim_page(ctx: AppContext) -> None:
                             lg,
                             "Strictly Causal Holdout Backtest & Ahead Forecast (P10–P90)",
                             "Validation Historique Causale & Prévision P10–P90",
+                            "الاختبار التاريخي السببي والتنبؤ المستقبلي بنطاق الثقة (P10–P90)",
                         )
                     )
                     t_label = "Load kW" if target_col == "load_kw" else "Solar PV kW"
@@ -131,7 +152,12 @@ def render_forecast_sim_page(ctx: AppContext) -> None:
             with col_imp:
                 with st.container(border=True):
                     render_section_header(
-                        bi(lg, "Permutation Feature Importance", "Importance des Variables (Permutation)")
+                        bi(
+                            lg,
+                            "Permutation Feature Importance",
+                            "Importance des Variables (Permutation)",
+                            "الأهمية النسبية للمتغيرات التفسيرية",
+                        )
                     )
                     st.plotly_chart(chart_feature_importance(fc_res["importance_df"]), width="stretch")
 
@@ -146,17 +172,42 @@ def render_forecast_sim_page(ctx: AppContext) -> None:
             top_l, top_r = st.columns([0.55, 0.45], vertical_alignment="center")
             with top_l:
                 render_section_header(
-                    bi(lg, "Configure Proposed PV + Battery ESS Architecture", "Architecture PV + Batterie Proposée")
+                    bi(
+                        lg,
+                        "Configure Proposed PV + Battery ESS Architecture",
+                        "Architecture PV + Batterie Proposée",
+                        "ضبط البنية المقترحة للألواح الشمسية ونظام تخزين البطاريات",
+                    )
                 )
             with top_r:
                 strat = st.selectbox(
-                    bi(lg, "Sizing Strategy Preset", "Stratégie de Dimensionnement"),
+                    bi(lg, "Sizing Strategy Preset", "Stratégie de Dimensionnement", "إستراتيجية التحجيم الهندسي"),
                     options=["custom", "balanced", "peak_shaving", "zero_export"],
                     format_func=lambda s: {
-                        "custom": bi(lg, "Manual Custom Sliders", "Réglage Manuel Personnalisé"),
-                        "balanced": bi(lg, "✨ Auto-Size: Balanced High Autarky (~80%)", "✨ Auto : Haute Autonomie (~80%)"),
-                        "peak_shaving": bi(lg, "⚡ Auto-Size: Evening Peak Shaving", "⚡ Auto : Écrêtement Pointe Soir"),
-                        "zero_export": bi(lg, "🛡️ Auto-Size: Zero-Export Self-Use", "🛡️ Auto : Autoconsommation Sans Export"),
+                        "custom": bi(
+                            lg,
+                            "Manual Custom Sliders",
+                            "Réglage Manuel Personnalisé",
+                            "ضبط يدوي مخصص للمؤشرات",
+                        ),
+                        "balanced": bi(
+                            lg,
+                            "✨ Auto-Size: Balanced High Autarky (~80%)",
+                            "✨ Auto : Haute Autonomie (~80%)",
+                            "✨ تحجيم تلقائي: اكتفاء ذاتي متوازن (~80%)",
+                        ),
+                        "peak_shaving": bi(
+                            lg,
+                            "⚡ Auto-Size: Evening Peak Shaving",
+                            "⚡ Auto : Écrêtement Pointe Soir",
+                            "⚡ تحجيم تلقائي: تقليص ذروة المساء",
+                        ),
+                        "zero_export": bi(
+                            lg,
+                            "🛡️ Auto-Size: Zero-Export Self-Use",
+                            "🛡️ Auto : Autoconsommation Sans Export",
+                            "🛡️ تحجيم تلقائي: استهلاك ذاتي بدون تصدير",
+                        ),
                     }[s],
                     key="sim_strategy_mode",
                     label_visibility="collapsed",
@@ -179,7 +230,7 @@ def render_forecast_sim_page(ctx: AppContext) -> None:
             s1, s2, s3, s4, s5 = st.columns(5)
             with s1:
                 sim_pv_kwp = st.slider(
-                    bi(lg, "Target PV (kWp)", "Puissance PV (kWc)"),
+                    bi(lg, "Target PV (kWp)", "Puissance PV (kWc)", "قدرة الألواح (kWp)"),
                     min_value=0.0,
                     max_value=max_pv_bound,
                     value=def_pv,
@@ -188,7 +239,7 @@ def render_forecast_sim_page(ctx: AppContext) -> None:
                 )
             with s2:
                 sim_ess_kwh = st.slider(
-                    bi(lg, "Battery Storage (kWh)", "Capacité BESS (kWh)"),
+                    bi(lg, "Battery Storage (kWh)", "Capacité BESS (kWh)", "سعة البطاريات (kWh)"),
                     min_value=0.0,
                     max_value=max_ess_bound,
                     value=def_ess,
@@ -197,7 +248,7 @@ def render_forecast_sim_page(ctx: AppContext) -> None:
                 )
             with s3:
                 sim_ess_kw = st.slider(
-                    bi(lg, "Max PCS Power (kW)", "Puissance PCS (kW)"),
+                    bi(lg, "Max PCS Power (kW)", "Puissance PCS (kW)", "قدرة عاكس البطارية (kW)"),
                     min_value=0.0,
                     max_value=max_pcs_bound,
                     value=def_pcs if sim_ess_kwh > 0 else 0.0,
@@ -206,7 +257,7 @@ def render_forecast_sim_page(ctx: AppContext) -> None:
                 )
             with s4:
                 sim_rte = st.slider(
-                    bi(lg, "Round-Trip Eff. (%)", "Rendement A/R (%)"),
+                    bi(lg, "Round-Trip Eff. (%)", "Rendement A/R (%)", "كفاءة الشحن/التفريغ (%)"),
                     min_value=78,
                     max_value=97,
                     value=92,
@@ -214,7 +265,7 @@ def render_forecast_sim_page(ctx: AppContext) -> None:
                 )
             with s5:
                 sim_min_soc = st.slider(
-                    bi(lg, "Min SoC Reserve (%)", "Réserve SoC Min (%)"),
+                    bi(lg, "Min SoC Reserve (%)", "Réserve SoC Min (%)", "الحد الأدنى للشحن (%)"),
                     min_value=5,
                     max_value=40,
                     value=15,
@@ -241,7 +292,7 @@ def render_forecast_sim_page(ctx: AppContext) -> None:
 
         d1, d2, d3, d4 = st.columns(4)
         d1.metric(
-            bi(lg, "Proposed Self-Sufficiency", "Autonomie Proposée"),
+            bi(lg, "Proposed Self-Sufficiency", "Autonomie Proposée", "الاكتفاء الذاتي المقترح"),
             f"{sim_kpis['self_sufficiency_pct']:.1f}%",
             delta=f"{sim_kpis['self_sufficiency_pct'] - bk['self_sufficiency_pct']:+.1f}% vs Baseline",
         )
@@ -249,19 +300,19 @@ def render_forecast_sim_page(ctx: AppContext) -> None:
             100.0 * (sim_kpis["grid_import_kwh"] - bk["grid_import_kwh"]) / max(bk["grid_import_kwh"], 1.0)
         )
         d2.metric(
-            bi(lg, "Proposed Grid Import", "Import Réseau Proposé"),
+            bi(lg, "Proposed Grid Import", "Import Réseau Proposé", "استيراد الشبكة المقترح"),
             f"{sim_kpis['grid_import_kwh']:,.0f} kWh",
             delta=f"{imp_delta_pct:+.1f}% vs Baseline",
             delta_color="inverse",
         )
         d3.metric(
-            bi(lg, "Proposed Net Grid Peak", "Pointe Réseau Proposée"),
+            bi(lg, "Proposed Net Grid Peak", "Pointe Réseau Proposée", "ذروة الشبكة المقترحة"),
             f"{sim_kpis['net_grid_peak_kw']:,.1f} kW",
             delta=f"{sim_kpis['net_grid_peak_kw'] - bk['net_grid_peak_kw']:+.1f} kW vs Baseline",
             delta_color="inverse",
         )
         d4.metric(
-            bi(lg, "Proposed Window Savings", "Économies Période"),
+            bi(lg, "Proposed Window Savings", "Économies Période", "الوفورات المالية المقترحة"),
             f"{sim_kpis['net_savings']:,.0f} {sym}",
             delta=f"{sim_kpis['net_savings'] - bk['net_savings']:+,.0f} {sym}",
         )
@@ -272,6 +323,7 @@ def render_forecast_sim_page(ctx: AppContext) -> None:
                     lg,
                     "7-Day Operational Dispatch Comparison (Baseline vs. Proposed Sizing)",
                     "Comparaison Opérationnelle sur 7 Jours (Référence vs Proposé)",
+                    "مقارنة التشغيل على مدى 7 أيام (الوضع المرجعي مقابل التصميم المقترح)",
                 )
             )
             st.plotly_chart(chart_battery_dispatch_comparison(ctx.df, sim_df), width="stretch")

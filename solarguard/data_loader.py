@@ -10,7 +10,19 @@ import pandas as pd
 from solarguard.data_generator import dispatch_microgrid_arrays
 
 COLUMN_ALIASES: Dict[str, Tuple[str, ...]] = {
-    "timestamp": ("timestamp", "datetime", "date_time", "date", "time", "horodatage", "heure", "period"),
+    "timestamp": (
+        "timestamp",
+        "datetime",
+        "date_time",
+        "date",
+        "time",
+        "horodatage",
+        "heure",
+        "period",
+        "التاريخ",
+        "الوقت",
+        "الزمن",
+    ),
     "load_kw": (
         "load_kw",
         "load",
@@ -23,6 +35,9 @@ COLUMN_ALIASES: Dict[str, Tuple[str, ...]] = {
         "power_kw",
         "energy_kwh",
         "kwh",
+        "الاستهلاك",
+        "الحمل",
+        "الطلب",
     ),
     "pv_ac_kw": (
         "pv_ac_kw",
@@ -36,6 +51,9 @@ COLUMN_ALIASES: Dict[str, Tuple[str, ...]] = {
         "production",
         "ac_power",
         "inverter_power",
+        "الطاقة_الشمسية",
+        "الانتاج_الشمسي",
+        "الإنتاج",
     ),
     "irradiance_wm2": (
         "irradiance_wm2",
@@ -46,6 +64,8 @@ COLUMN_ALIASES: Dict[str, Tuple[str, ...]] = {
         "solar_radiation",
         "ensoleillement",
         "wm2",
+        "الإشعاع",
+        "اشعاع",
     ),
     "ambient_temp_c": (
         "ambient_temp_c",
@@ -54,9 +74,11 @@ COLUMN_ALIASES: Dict[str, Tuple[str, ...]] = {
         "temperature",
         "temp_c",
         "air_temp",
+        "درجة_الحرارة",
+        "الحرارة",
     ),
-    "cell_temp_c": ("cell_temp_c", "module_temp", "panel_temp", "pv_temp", "t_cell"),
-    "battery_soc_pct": ("battery_soc_pct", "soc", "soc_pct", "battery_soc", "etat_charge"),
+    "cell_temp_c": ("cell_temp_c", "module_temp", "panel_temp", "pv_temp", "t_cell", "حرارة_الخلية"),
+    "battery_soc_pct": ("battery_soc_pct", "soc", "soc_pct", "battery_soc", "etat_charge", "نسبة_الشحن"),
 }
 
 

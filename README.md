@@ -52,7 +52,7 @@ SolarGuard-DZ/
 ├── data/
 │   └── sample_solarguard_oran_2026.csv
 ├── solarguard/
-│   ├── config.py                  # 12-Wilaya solar atlas, facility presets, tariffs & EN/FR i18n
+│   ├── config.py                  # 12-Wilaya solar atlas, facility presets, tariffs & EN/FR/AR i18n
 │   ├── data_generator.py          # Physics-based 8,760h solar, load, ESS & fault generator
 │   ├── data_loader.py             # Smart CSV/Excel ingestion, auto-mapper & unit normalizer
 │   ├── analytics.py               # IEC 61724 KPIs, waterfall, LDC, ToU, FFT & ESS sizing

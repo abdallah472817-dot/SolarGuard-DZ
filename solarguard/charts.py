@@ -7,7 +7,7 @@ import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-from solarguard.config import PALETTE, WILAYAS_CATALOG
+from solarguard.config import PALETTE, WILAYAS_CATALOG, wilaya_display_name, wilaya_zone_name
 
 FONT_STACK = "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
 
@@ -225,19 +225,19 @@ def chart_energy_sankey(kpis: dict) -> go.Figure:
     return fig
 
 
-def chart_algeria_solar_map(active_wilaya_key: str) -> go.Figure:
+def chart_algeria_solar_map(active_wilaya_key: str, lang: str = "en") -> go.Figure:
     """Offline-safe dark geospatial Scattergeo Solar Irradiation Atlas across 12 Algerian Wilayas."""
     rows = []
     for k, w in WILAYAS_CATALOG.items():
         rows.append(
             {
                 "key": k,
-                "name": f"{w.code} - {w.name}",
+                "name": f"{w.code} - {wilaya_display_name(w, lang)}",
                 "lat": w.lat,
                 "lon": w.lon,
                 "ghi": w.annual_ghi_kwh_m2,
                 "tilt": w.optimal_tilt_deg,
-                "zone": w.zone,
+                "zone": wilaya_zone_name(w, lang),
                 "soiling": w.soiling_risk,
                 "summer_c": w.avg_temp_summer_c,
                 "is_active": k == active_wilaya_key,

@@ -1,4 +1,4 @@
-"""Executive Dark-Mode SaaS & CleanTech theme, CSS architecture, and UI components."""
+"""Executive Dark-Mode SaaS & CleanTech theme, RTL Arabic support, and UI components."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ import html
 from typing import TYPE_CHECKING
 import streamlit as st
 
-from solarguard.config import WILAYAS_CATALOG
+from solarguard.config import WILAYAS_CATALOG, bi, wilaya_display_name
 
 if TYPE_CHECKING:
     from solarguard.ui import AppContext
@@ -383,14 +383,12 @@ section[data-testid="stSidebar"] hr {
 /* ==========================================================================
    7. FORM CONTROLS: DROPDOWNS, RADIOS, TABS, INPUTS, EXPANDERS & BUTTONS
    ========================================================================== */
-/* Labels */
 [data-testid="stWidgetLabel"] p {
     color: #CBD5E1 !important;
     font-size: 0.81rem !important;
     font-weight: 500 !important;
 }
 
-/* Selectbox & Inputs */
 div[data-baseweb="select"] > div,
 div[data-baseweb="input"] > div,
 div[data-baseweb="base-input"] {
@@ -405,18 +403,16 @@ div[data-baseweb="input"] > div:hover {
     border-color: rgba(245, 158, 11, 0.55) !important;
 }
 
-/* Horizontal Radio Groups */
 [data-testid="stRadio"] div[role="radiogroup"] {
     gap: 8px;
 }
 
 [data-testid="stRadio"] label p {
     color: #E2E8F0 !important;
-    font-size: 0.82rem !important;
+    font-size: 0.81rem !important;
     font-weight: 500 !important;
 }
 
-/* Tabs */
 div[data-baseweb="tab-list"] {
     gap: 8px;
     background: rgba(15, 23, 42, 0.65);
@@ -450,14 +446,12 @@ div[data-baseweb="tab-highlight"] {
     display: none !important;
 }
 
-/* Expanders */
 [data-testid="stExpander"] {
     background-color: rgba(17, 24, 39, 0.85) !important;
     border: 1px solid var(--sg-border-subtle) !important;
     border-radius: 12px !important;
 }
 
-/* Buttons & Download Buttons */
 [data-testid="stDownloadButton"] button,
 [data-testid="stButton"] button {
     border-radius: 10px !important;
@@ -487,7 +481,6 @@ div[data-baseweb="tab-highlight"] {
     color: #FDE68A !important;
 }
 
-/* Dataframes */
 [data-testid="stDataFrame"] {
     border-radius: 10px;
     overflow: hidden;
@@ -497,9 +490,93 @@ div[data-baseweb="tab-highlight"] {
 """
 
 
-def inject_custom_css() -> None:
-    """Inject executive SaaS & CleanTech dark-mode CSS styling."""
+ARABIC_RTL_CSS = """
+<style>
+/* ==========================================================================
+   ARABIC (العربية) RIGHT-TO-LEFT TYPOGRAPHY & LAYOUT OVERRIDES
+   ========================================================================== */
+html, body, [data-testid="stAppViewContainer"], section[data-testid="stSidebar"] {
+    font-family: 'Noto Sans Arabic', 'IBM Plex Sans Arabic', 'Cairo', 'Tajawal',
+                 'Segoe UI', Tahoma, sans-serif !important;
+}
+
+.sg-banner {
+    direction: rtl;
+    text-align: right;
+    border-left: 1px solid rgba(148, 163, 184, 0.18) !important;
+    border-right: 4px solid var(--sg-amber) !important;
+}
+
+.sg-section-hdr,
+.sg-brand-card,
+.sg-sb-section,
+.sg-sb-status,
+[data-testid="stCaptionContainer"],
+[data-testid="stWidgetLabel"],
+[data-testid="stAlert"],
+[data-testid="stExpander"] summary {
+    direction: rtl;
+    text-align: right;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+}
+
+[data-testid="stMetric"] {
+    direction: rtl;
+    text-align: right;
+}
+
+[data-testid="stMetricLabel"] p,
+[data-testid="stMetricLabel"] div {
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    font-size: 0.8rem !important;
+    text-align: right !important;
+}
+
+/* Keep technical numerals, +/- deltas, units & charts cleanly isolated in LTR */
+[data-testid="stMetricValue"] > div,
+[data-testid="stMetricDelta"] > div,
+.sg-ltr {
+    direction: ltr;
+    unicode-bidi: isolate;
+}
+
+[data-testid="stPlotlyChart"],
+[data-testid="stDataFrame"] {
+    direction: ltr;
+}
+
+[data-testid="stSidebarNav"] a {
+    direction: rtl;
+    text-align: right;
+    border-left: none !important;
+    border-right: 3px solid transparent;
+}
+
+[data-testid="stSidebarNav"] a[aria-current="page"] {
+    background: linear-gradient(270deg, rgba(245, 158, 11, 0.18) 0%, rgba(245, 158, 11, 0.04) 100%) !important;
+    border-left: none !important;
+    border-right: 3px solid #F59E0B !important;
+}
+
+div[data-baseweb="tab-list"] {
+    direction: rtl;
+}
+</style>
+"""
+
+
+def inject_custom_css(lang: str = "en") -> None:
+    """Inject executive SaaS & CleanTech dark-mode CSS styling (plus RTL when Arabic is active)."""
     st.markdown(EXECUTIVE_DARK_CSS, unsafe_allow_html=True)
+    if lang == "ar":
+        st.markdown(ARABIC_RTL_CSS, unsafe_allow_html=True)
+
+
+def inject_rtl_css() -> None:
+    """Inject Arabic RTL stylesheet override when needed inside isolated view runs."""
+    st.markdown(ARABIC_RTL_CSS, unsafe_allow_html=True)
 
 
 def render_page_banner(ctx: "AppContext", page_title: str, subtitle: str) -> None:
@@ -508,9 +585,11 @@ def render_page_banner(ctx: "AppContext", page_title: str, subtitle: str) -> Non
     safe_title = html.escape(str(page_title))
     safe_sub = html.escape(str(subtitle))
     safe_site = html.escape(str(ctx.site_label))
-    safe_wname = html.escape(str(w.name))
+    safe_wname = html.escape(str(wilaya_display_name(w, ctx.lang)))
     safe_curr = html.escape(str(ctx.tariff.currency))
     safe_sym = html.escape(str(ctx.tariff.symbol))
+    yr_unit = bi(ctx.lang, "kWh/m²/yr", "kWh/m²/an", "kWh/m²/سنة")
+    ess_lbl = bi(ctx.lang, "ESS", "BESS", "بطاريات")
     st.markdown(
         f"""
         <div class="sg-banner">
@@ -520,9 +599,9 @@ def render_page_banner(ctx: "AppContext", page_title: str, subtitle: str) -> Non
             </div>
             <div class="sg-pill-row">
                 <span class="sg-pill sg-pill-amber"><span class="sg-dot"></span>{safe_site}</span>
-                <span class="sg-pill sg-pill-cyan">☀️ {safe_wname} • {w.annual_ghi_kwh_m2:.0f} kWh/m²/yr</span>
-                <span class="sg-pill sg-pill-emerald">⚡ {ctx.pv_capacity_kwp:,.0f} kWp PV • {ctx.battery_capacity_kwh:,.0f} kWh ESS</span>
-                <span class="sg-pill">{safe_curr} ({safe_sym})</span>
+                <span class="sg-pill sg-pill-cyan">☀️ {safe_wname} • <span class="sg-ltr">{w.annual_ghi_kwh_m2:.0f} {yr_unit}</span></span>
+                <span class="sg-pill sg-pill-emerald">⚡ <span class="sg-ltr">{ctx.pv_capacity_kwp:,.0f} kWp PV • {ctx.battery_capacity_kwh:,.0f} kWh</span> {ess_lbl}</span>
+                <span class="sg-pill"><span class="sg-ltr">{safe_curr} ({safe_sym})</span></span>
             </div>
         </div>
         """,
@@ -535,15 +614,16 @@ def render_section_header(title: str) -> None:
     st.markdown(f'<div class="sg-section-hdr">{html.escape(str(title))}</div>', unsafe_allow_html=True)
 
 
-def render_sidebar_brand(subtitle: str) -> None:
+def render_sidebar_brand(subtitle: str, lang: str = "en") -> None:
     """Render sleek CleanTech SaaS brand card at the top of the sidebar."""
     safe_sub = html.escape(str(subtitle))
+    badge_txt = "مباشر EMS" if lang == "ar" else "LIVE EMS"
     st.markdown(
         f"""
         <div class="sg-brand-card">
             <div class="sg-brand-row">
                 <span class="sg-brand-title">☀️ SolarGuard-DZ</span>
-                <span class="sg-brand-badge">LIVE EMS</span>
+                <span class="sg-brand-badge">{badge_txt}</span>
             </div>
             <div class="sg-brand-sub">{safe_sub}</div>
         </div>

@@ -6,7 +6,7 @@ import numpy as np
 import streamlit as st
 
 from solarguard.charts import chart_correlation_heatmap
-from solarguard.config import WILAYAS_CATALOG, bi
+from solarguard.config import WILAYAS_CATALOG, bi, wilaya_display_name
 from solarguard.economics import compute_lifecycle_economics
 from solarguard.exporter import (
     build_excel_audit_workbook,
@@ -24,11 +24,13 @@ def render_data_studio_page(ctx: AppContext) -> None:
             lg,
             "Data Studio, Statistical Audit & Report Exports",
             "Studio de Données, Statistiques & Rapports d'Audit",
+            "استوديو البيانات، التدقيق الإحصائي وتصدير التقارير",
         ),
         subtitle=bi(
             lg,
             "Hourly telemetry inspector, multivariate correlation matrix, descriptive statistics, and 1-click audit exports.",
             "Exploration des séries horaires, matrice de corrélation, contrôle qualité et exports Excel / CSV / HTML.",
+            "مستكشف القياسات الساعية، مصفوفة ارتباط بيرسون، الإحصاءات الوصفية وتصدير تقارير التدقيق بضغطة واحدة.",
         ),
     )
 
@@ -55,6 +57,7 @@ def render_data_studio_page(ctx: AppContext) -> None:
                 lg,
                 "Executive Audit & Telemetry Export Center",
                 "Centre d'Exportation des Rapports d'Audit",
+                "مركز تصدير تقارير التدقيق التنفيذية والبيانات الهندسية",
             )
         )
         st.caption(
@@ -62,6 +65,7 @@ def render_data_studio_page(ctx: AppContext) -> None:
                 lg,
                 "Download formatted multi-sheet Excel workbooks, anomaly-annotated CSV logs, printable HTML reports, or an upload template.",
                 "Téléchargez le classeur d'audit Excel multi-feuilles, les données annotées CSV, le rapport exécutif HTML ou un modèle CSV.",
+                "حمّل مصنف التدقيق متعدد الأوراق بصيغة Excel، أو السجلات المصنفة بصيغة CSV، أو التقرير التنفيذي للطباعة بصيغة HTML، أو نموذج الرفع.",
             )
         )
 
@@ -75,7 +79,8 @@ def render_data_studio_page(ctx: AppContext) -> None:
             currency_symbol=sym,
         )
         csv_bytes = annotated_df.to_csv(index=False).encode("utf-8")
-        w_name = WILAYAS_CATALOG.get(ctx.wilaya_key, WILAYAS_CATALOG["Oran"]).name
+        w_obj = WILAYAS_CATALOG.get(ctx.wilaya_key, WILAYAS_CATALOG["Oran"])
+        w_name = wilaya_display_name(w_obj, lg)
         html_str = build_html_audit_report(
             site_label=ctx.site_label,
             wilaya_name=w_name,
@@ -90,7 +95,7 @@ def render_data_studio_page(ctx: AppContext) -> None:
         b1, b2, b3, b4 = st.columns(4)
         with b1:
             st.download_button(
-                label=bi(lg, "📊 Excel Audit (.xlsx)", "📊 Audit Excel (.xlsx)"),
+                label=bi(lg, "📊 Excel Audit (.xlsx)", "📊 Audit Excel (.xlsx)", "📊 مصنف تدقيق Excel (.xlsx)"),
                 data=xlsx_bytes,
                 file_name="SolarGuard_DZ_Energy_Audit.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -99,7 +104,7 @@ def render_data_studio_page(ctx: AppContext) -> None:
             )
         with b2:
             st.download_button(
-                label=bi(lg, "📄 Enriched Telemetry (.csv)", "📄 Télémesures Annotées (.csv)"),
+                label=bi(lg, "📄 Enriched Telemetry (.csv)", "📄 Télémesures Annotées (.csv)", "📄 القياسات المصنفة (.csv)"),
                 data=csv_bytes,
                 file_name="SolarGuard_DZ_Telemetry_Annotated.csv",
                 mime="text/csv",
@@ -107,7 +112,7 @@ def render_data_studio_page(ctx: AppContext) -> None:
             )
         with b3:
             st.download_button(
-                label=bi(lg, "🖨️ Executive Report (.html)", "🖨️ Rapport Exécutif (.html)"),
+                label=bi(lg, "🖨️ Executive Report (.html)", "🖨️ Rapport Exécutif (.html)", "🖨️ التقرير التنفيذي (.html)"),
                 data=html_str.encode("utf-8"),
                 file_name="SolarGuard_DZ_Executive_Report.html",
                 mime="text/html",
@@ -115,7 +120,7 @@ def render_data_studio_page(ctx: AppContext) -> None:
             )
         with b4:
             st.download_button(
-                label=bi(lg, "📥 Sample Upload Template", "📥 Modèle CSV d'Import"),
+                label=bi(lg, "📥 Sample Upload Template", "📥 Modèle CSV d'Import", "📥 نموذج CSV جاهز للرفع"),
                 data=tpl_bytes,
                 file_name="SolarGuard_Upload_Template.csv",
                 mime="text/csv",
@@ -139,7 +144,12 @@ def render_data_studio_page(ctx: AppContext) -> None:
     with col_stat:
         with st.container(border=True):
             render_section_header(
-                bi(lg, "Descriptive Engineering Statistics", "Statistiques Descriptives des Capteurs")
+                bi(
+                    lg,
+                    "Descriptive Engineering Statistics",
+                    "Statistiques Descriptives des Capteurs",
+                    "الإحصاءات الهندسية الوصفية لقنوات القياس",
+                )
             )
             desc = (
                 ctx.df[avail_cols]
@@ -163,7 +173,12 @@ def render_data_studio_page(ctx: AppContext) -> None:
     with col_corr:
         with st.container(border=True):
             render_section_header(
-                bi(lg, "Multivariate Pearson Correlation Matrix", "Matrice de Corrélation de Pearson")
+                bi(
+                    lg,
+                    "Multivariate Pearson Correlation Matrix",
+                    "Matrice de Corrélation de Pearson",
+                    "مصفوفة الارتباط متعدد المتغيرات (بيرسون)",
+                )
             )
             corr = ctx.df[avail_cols].corr().fillna(0.0).round(2)
             short_labels = [
@@ -176,11 +191,21 @@ def render_data_studio_page(ctx: AppContext) -> None:
         hdr_l, hdr_r = st.columns([0.65, 0.35], vertical_alignment="center")
         with hdr_l:
             render_section_header(
-                bi(lg, "Hourly SCADA / Smart-Meter Telemetry Explorer", "Explorateur des Séries Horaires SCADA")
+                bi(
+                    lg,
+                    "Hourly SCADA / Smart-Meter Telemetry Explorer",
+                    "Explorateur des Séries Horaires SCADA",
+                    "مستكشف السجلات الساعية لنظام SCADA والعدادات الذكية",
+                )
             )
         with hdr_r:
             only_anom = st.toggle(
-                bi(lg, "Show Flagged Anomalies Only", "Afficher Uniquement les Anomalies"),
+                bi(
+                    lg,
+                    "Show Flagged Anomalies Only",
+                    "Afficher Uniquement les Anomalies",
+                    "عرض الساعات الشاذة فقط",
+                ),
                 value=False,
             )
 
@@ -207,6 +232,8 @@ def render_data_studio_page(ctx: AppContext) -> None:
                 + ("" if only_anom else " (first 500 rows shown; use CSV download above for full export)."),
                 f"Affichage de {len(view_df):,} lignes"
                 + ("" if only_anom else " (500 premières lignes affichées ; utilisez l'export CSV complet ci-dessus)."),
+                f"يتم عرض {len(view_df):,} سطر"
+                + ("" if only_anom else " (أول 500 سطر للعرض السريع؛ استخدم زر تصدير CSV أعلاه لتحميل السجل الكامل)."),
             )
         )
         st.dataframe(view_df[display_cols], width="stretch", hide_index=True, height=340)
