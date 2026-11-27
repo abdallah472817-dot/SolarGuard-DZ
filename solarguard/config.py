@@ -362,19 +362,20 @@ TARIFF_PROFILES: Dict[str, TariffScheme] = {
 # Algeria grid carbon intensity (kg CO2e per kWh) - natural gas combined/open cycle mix
 GRID_CO2_KG_PER_KWH: float = 0.548
 
-# Semantic color system for Solar Engineering UI
+# Semantic color system for Executive Dark-Mode CleanTech UI
 PALETTE = {
-    "pv": "#D97706",          # Solar Amber
-    "pv_light": "#FBBF24",    # Warm Sun
-    "load": "#0284C7",        # Electrical Sky Blue
-    "grid_import": "#6366F1", # Grid Indigo
-    "grid_export": "#14B8A6", # Export Teal
-    "battery": "#059669",     # ESS Emerald
-    "anomaly": "#DC2626",     # Fault Crimson
-    "warning": "#EA580C",     # Thermal/Dust Orange
-    "slate": "#0F172A",       # Primary Ink
-    "muted": "#64748B",       # Secondary Label
-    "gridline": "#E2E8F0",    # Crisp Subtle Rule
+    "pv": "#F59E0B",          # Solar Amber / Gold (Primary Accent)
+    "pv_light": "#FBBF24",    # Warm Solar Highlight
+    "load": "#06B6D4",        # CleanTech Cyan (Load / Telemetry)
+    "grid_import": "#F43F5E", # Coral / Rose Red (Grid Import)
+    "grid_export": "#10B981", # Clean Energy Emerald (Export / Savings)
+    "battery": "#10B981",     # ESS Storage Emerald
+    "cyan": "#22D3EE",        # Luminous Cyan Accent (SoC / Atlas)
+    "anomaly": "#EF4444",     # Fault Crimson
+    "warning": "#FB923C",     # Thermal / Dust Amber-Orange
+    "slate": "#F8FAFC",       # Primary Off-White Ink
+    "muted": "#94A3B8",       # Secondary Muted Slate Label
+    "gridline": "rgba(148, 163, 184, 0.14)",  # Crisp Dark-Mode Gridline
 }
 
 

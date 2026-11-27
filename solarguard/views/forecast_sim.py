@@ -16,7 +16,7 @@ from solarguard.charts import (
     chart_forecast_horizon,
 )
 from solarguard.config import PALETTE, bi
-from solarguard.ui import AppContext, cached_run_forecast, render_page_banner
+from solarguard.ui import AppContext, cached_run_forecast, render_page_banner, render_section_header
 
 
 def render_forecast_sim_page(ctx: AppContext) -> None:
@@ -114,9 +114,12 @@ def render_forecast_sim_page(ctx: AppContext) -> None:
             col_main, col_imp = st.columns([0.68, 0.32])
             with col_main:
                 with st.container(border=True):
-                    st.markdown(
-                        f'<div class="sg-section-hdr">{bi(lg, "Strictly Causal Holdout Backtest & Ahead Forecast (P10–P90)", "Validation Historique Causale & Prévision P10–P90")}</div>',
-                        unsafe_allow_html=True,
+                    render_section_header(
+                        bi(
+                            lg,
+                            "Strictly Causal Holdout Backtest & Ahead Forecast (P10–P90)",
+                            "Validation Historique Causale & Prévision P10–P90",
+                        )
                     )
                     t_label = "Load kW" if target_col == "load_kw" else "Solar PV kW"
                     c_hex = PALETTE["load"] if target_col == "load_kw" else PALETTE["pv"]
@@ -127,9 +130,8 @@ def render_forecast_sim_page(ctx: AppContext) -> None:
 
             with col_imp:
                 with st.container(border=True):
-                    st.markdown(
-                        f'<div class="sg-section-hdr">{bi(lg, "Permutation Feature Importance", "Importance des Variables (Permutation)")}</div>',
-                        unsafe_allow_html=True,
+                    render_section_header(
+                        bi(lg, "Permutation Feature Importance", "Importance des Variables (Permutation)")
                     )
                     st.plotly_chart(chart_feature_importance(fc_res["importance_df"]), width="stretch")
 
@@ -143,9 +145,8 @@ def render_forecast_sim_page(ctx: AppContext) -> None:
         with st.container(border=True):
             top_l, top_r = st.columns([0.55, 0.45], vertical_alignment="center")
             with top_l:
-                st.markdown(
-                    f'<div class="sg-section-hdr">{bi(lg, "Configure Proposed PV + Battery ESS Architecture", "Architecture PV + Batterie Proposée")}</div>',
-                    unsafe_allow_html=True,
+                render_section_header(
+                    bi(lg, "Configure Proposed PV + Battery ESS Architecture", "Architecture PV + Batterie Proposée")
                 )
             with top_r:
                 strat = st.selectbox(
@@ -266,8 +267,11 @@ def render_forecast_sim_page(ctx: AppContext) -> None:
         )
 
         with st.container(border=True):
-            st.markdown(
-                f'<div class="sg-section-hdr">{bi(lg, "7-Day Operational Dispatch Comparison (Baseline vs. Proposed Sizing)", "Comparaison Opérationnelle sur 7 Jours (Référence vs Proposé)")}</div>',
-                unsafe_allow_html=True,
+            render_section_header(
+                bi(
+                    lg,
+                    "7-Day Operational Dispatch Comparison (Baseline vs. Proposed Sizing)",
+                    "Comparaison Opérationnelle sur 7 Jours (Référence vs Proposé)",
+                )
             )
             st.plotly_chart(chart_battery_dispatch_comparison(ctx.df, sim_df), width="stretch")

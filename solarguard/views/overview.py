@@ -11,7 +11,7 @@ from solarguard.charts import (
     chart_energy_sankey,
 )
 from solarguard.config import WILAYAS_CATALOG, bi
-from solarguard.ui import AppContext, render_page_banner
+from solarguard.ui import AppContext, render_page_banner, render_section_header
 
 
 def render_overview_page(ctx: AppContext) -> None:
@@ -117,9 +117,12 @@ def render_overview_page(ctx: AppContext) -> None:
     with st.container(border=True):
         hdr_col, ctrl_col = st.columns([0.64, 0.36], vertical_alignment="center")
         with hdr_col:
-            st.markdown(
-                f'<div class="sg-section-hdr">{bi(lg, "Energy Balance Dispatch & Battery State-of-Charge Timeline", "Chronologie du Bilan Énergétique & État de Charge Batterie (SoC)")}</div>',
-                unsafe_allow_html=True,
+            render_section_header(
+                bi(
+                    lg,
+                    "Energy Balance Dispatch & Battery State-of-Charge Timeline",
+                    "Chronologie du Bilan Énergétique & État de Charge Batterie (SoC)",
+                )
             )
             st.caption(
                 bi(
@@ -156,9 +159,8 @@ def render_overview_page(ctx: AppContext) -> None:
 
     with left_col:
         with st.container(border=True):
-            st.markdown(
-                f'<div class="sg-section-hdr">{bi(lg, "Source-to-Sink Energy Flow Diagram", "Flux Énergétiques Source-à-Charge (Sankey)")}</div>',
-                unsafe_allow_html=True,
+            render_section_header(
+                bi(lg, "Source-to-Sink Energy Flow Diagram", "Flux Énergétiques Source-à-Charge (Sankey)")
             )
             st.caption(
                 bi(
@@ -172,9 +174,8 @@ def render_overview_page(ctx: AppContext) -> None:
     with right_col:
         with st.container(border=True):
             w_prof = WILAYAS_CATALOG.get(ctx.wilaya_key, WILAYAS_CATALOG["Oran"])
-            st.markdown(
-                f'<div class="sg-section-hdr">{bi(lg, "Algeria Solar Resource Atlas (12 Wilayas)", "Atlas Solaire Algérien (12 Wilayas)")}</div>',
-                unsafe_allow_html=True,
+            render_section_header(
+                bi(lg, "Algeria Solar Resource Atlas (12 Wilayas)", "Atlas Solaire Algérien (12 Wilayas)")
             )
             st.caption(
                 bi(

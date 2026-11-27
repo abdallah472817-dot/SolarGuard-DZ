@@ -13,7 +13,7 @@ from solarguard.charts import (
     chart_tou_breakdown,
 )
 from solarguard.config import bi
-from solarguard.ui import AppContext, render_page_banner
+from solarguard.ui import AppContext, render_page_banner, render_section_header
 
 
 def render_load_grid_page(ctx: AppContext) -> None:
@@ -79,9 +79,8 @@ def render_load_grid_page(ctx: AppContext) -> None:
     r1_left, r1_right = st.columns(2)
     with r1_left:
         with st.container(border=True):
-            st.markdown(
-                f'<div class="sg-section-hdr">{bi(lg, "24-Hour × Monthly Demand Intensity Heatmap", "Matrice Thermique Horaire × Mensuelle (kW)")}</div>',
-                unsafe_allow_html=True,
+            render_section_header(
+                bi(lg, "24-Hour × Monthly Demand Intensity Heatmap", "Matrice Thermique Horaire × Mensuelle (kW)")
             )
             st.caption(
                 bi(
@@ -94,9 +93,8 @@ def render_load_grid_page(ctx: AppContext) -> None:
 
     with r1_right:
         with st.container(border=True):
-            st.markdown(
-                f'<div class="sg-section-hdr">{bi(lg, "Load Duration Curve (Gross Load vs. Net Grid)", "Monotone de Puissance (Charge Brute vs Réseau)")}</div>',
-                unsafe_allow_html=True,
+            render_section_header(
+                bi(lg, "Load Duration Curve (Gross Load vs. Net Grid)", "Monotone de Puissance (Charge Brute vs Réseau)")
             )
             st.caption(
                 bi(
@@ -110,9 +108,12 @@ def render_load_grid_page(ctx: AppContext) -> None:
     r2_left, r2_right = st.columns(2)
     with r2_left:
         with st.container(border=True):
-            st.markdown(
-                f'<div class="sg-section-hdr">{bi(lg, "Diurnal Profiles: Workweek (Sun–Thu) vs. Weekend (Fri–Sat)", "Profils Journaliers Ouvrés (Dim–Jeu) vs Week-end (Ven–Sam)")}</div>',
-                unsafe_allow_html=True,
+            render_section_header(
+                bi(
+                    lg,
+                    "Diurnal Profiles: Workweek (Sun–Thu) vs. Weekend (Fri–Sat)",
+                    "Profils Journaliers Ouvrés (Dim–Jeu) vs Week-end (Ven–Sam)",
+                )
             )
             st.caption(
                 bi(
@@ -125,9 +126,12 @@ def render_load_grid_page(ctx: AppContext) -> None:
 
     with r2_right:
         with st.container(border=True):
-            st.markdown(
-                f'<div class="sg-section-hdr">{bi(lg, "Time-of-Use (ToU) Tariff Window Breakdown", "Répartition par Poste Tarifaire (Creuse / Pleine / Pointe)")}</div>',
-                unsafe_allow_html=True,
+            render_section_header(
+                bi(
+                    lg,
+                    "Time-of-Use (ToU) Tariff Window Breakdown",
+                    "Répartition par Poste Tarifaire (Creuse / Pleine / Pointe)",
+                )
             )
             st.caption(
                 bi(
@@ -139,9 +143,12 @@ def render_load_grid_page(ctx: AppContext) -> None:
             st.plotly_chart(chart_tou_breakdown(diag["tou_df"]), width="stretch")
 
     with st.container(border=True):
-        st.markdown(
-            f'<div class="sg-section-hdr">{bi(lg, "Fast Fourier Transform (FFT) Load Periodicity Spectrum", "Analyse Spectrale FFT des Cycles de Consommation")}</div>',
-            unsafe_allow_html=True,
+        render_section_header(
+            bi(
+                lg,
+                "Fast Fourier Transform (FFT) Load Periodicity Spectrum",
+                "Analyse Spectrale FFT des Cycles de Consommation",
+            )
         )
         st.caption(
             bi(

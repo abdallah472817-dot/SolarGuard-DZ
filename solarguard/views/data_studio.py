@@ -3,10 +3,9 @@
 from __future__ import annotations
 
 import numpy as np
-import plotly.graph_objects as go
 import streamlit as st
 
-from solarguard.charts import _apply_solar_layout
+from solarguard.charts import chart_correlation_heatmap
 from solarguard.config import WILAYAS_CATALOG, bi
 from solarguard.economics import compute_lifecycle_economics
 from solarguard.exporter import (
@@ -139,9 +138,8 @@ def render_data_studio_page(ctx: AppContext) -> None:
     col_stat, col_corr = st.columns([0.55, 0.45])
     with col_stat:
         with st.container(border=True):
-            st.markdown(
-                f'<div class="sg-section-hdr">{bi(lg, "Descriptive Engineering Statistics", "Statistiques Descriptives des Capteurs")}</div>',
-                unsafe_allow_html=True,
+            render_section_header(
+                bi(lg, "Descriptive Engineering Statistics", "Statistiques Descriptives des Capteurs")
             )
             desc = (
                 ctx.df[avail_cols]
@@ -164,37 +162,21 @@ def render_data_studio_page(ctx: AppContext) -> None:
 
     with col_corr:
         with st.container(border=True):
-            st.markdown(
-                f'<div class="sg-section-hdr">{bi(lg, "Multivariate Pearson Correlation Matrix", "Matrice de Corrélation de Pearson")}</div>',
-                unsafe_allow_html=True,
+            render_section_header(
+                bi(lg, "Multivariate Pearson Correlation Matrix", "Matrice de Corrélation de Pearson")
             )
             corr = ctx.df[avail_cols].corr().fillna(0.0).round(2)
             short_labels = [
                 c.replace("_wm2", "").replace("_kw", "").replace("_pct", "%").replace("_c", "°C")
                 for c in avail_cols
             ]
-            fig_corr = go.Figure(
-                data=go.Heatmap(
-                    z=corr.values,
-                    x=short_labels,
-                    y=short_labels,
-                    zmin=-1,
-                    zmax=1,
-                    colorscale="RdBu_r",
-                    text=corr.values,
-                    texttemplate="%{text:.2f}",
-                    textfont=dict(size=10),
-                )
-            )
-            _apply_solar_layout(fig_corr, height=345, hovermode="closest")
-            st.plotly_chart(fig_corr, width="stretch")
+            st.plotly_chart(chart_correlation_heatmap(corr, short_labels), width="stretch")
 
     with st.container(border=True):
         hdr_l, hdr_r = st.columns([0.65, 0.35], vertical_alignment="center")
         with hdr_l:
-            st.markdown(
-                f'<div class="sg-section-hdr">{bi(lg, "Hourly SCADA / Smart-Meter Telemetry Explorer", "Explorateur des Séries Horaires SCADA")}</div>',
-                unsafe_allow_html=True,
+            render_section_header(
+                bi(lg, "Hourly SCADA / Smart-Meter Telemetry Explorer", "Explorateur des Séries Horaires SCADA")
             )
         with hdr_r:
             only_anom = st.toggle(

@@ -20,6 +20,7 @@ from solarguard.charts import (
     chart_anomaly_timeline,
     chart_battery_dispatch_comparison,
     chart_cashflow_projection,
+    chart_correlation_heatmap,
     chart_diurnal_profiles,
     chart_energy_balance_timeline,
     chart_energy_sankey,
@@ -173,6 +174,9 @@ def test_all_16_plotly_charts_serialize_to_json():
     sim = simulate_custom_sizing(df, 250.0, 350.0, 450.0, 180.0)
     econ = compute_lifecycle_economics(df, tariff, 250.0, 300.0, 118000.0, 46000.0)
 
+    corr_cols = ["irradiance_wm2", "pv_ac_kw", "load_kw", "battery_soc_pct"]
+    corr_df = df[corr_cols].corr().fillna(0.0).round(2)
+
     figs = [
         chart_energy_balance_timeline(resample_energy_frame(df, "1D"), "1D"),
         chart_energy_sankey(kpis),
@@ -185,12 +189,15 @@ def test_all_16_plotly_charts_serialize_to_json():
         chart_diurnal_profiles(diag["diurnal_df"]),
         chart_tou_breakdown(diag["tou_df"]),
         chart_fft_spectrum(diag["fft_df"]),
-        chart_forecast_horizon(fc["backtest_df"], fc["forecast_df"], "Load kW", "#0284C7"),
+        chart_forecast_horizon(fc["backtest_df"], fc["forecast_df"], "Load kW", "#06B6D4"),
         chart_feature_importance(fc["importance_df"]),
         chart_battery_dispatch_comparison(df, sim),
         chart_cashflow_projection(econ["cashflow_df"], "DA"),
         chart_monthly_bills(econ["monthly_df"], "DA"),
+        chart_correlation_heatmap(corr_df, corr_cols),
     ]
     for fig in figs:
+        assert fig.layout.paper_bgcolor == "rgba(0,0,0,0)"
+        assert fig.layout.plot_bgcolor == "rgba(0,0,0,0)"
         payload = fig.to_json()
         assert len(payload) > 100

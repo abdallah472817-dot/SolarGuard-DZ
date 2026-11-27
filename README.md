@@ -45,7 +45,7 @@
 
 ```text
 SolarGuard-DZ/
-├── .streamlit/config.toml         # Server, CORS/iframe & daylight engineering theme config
+├── .streamlit/config.toml         # Server, CORS/iframe & executive CleanTech dark theme
 ├── app.py                         # Streamlit multi-page navigation entrypoint
 ├── requirements.txt               # Reproducible Python dependencies
 ├── pyproject.toml                 # Package metadata & pytest configuration
@@ -59,9 +59,9 @@ SolarGuard-DZ/
 │   ├── anomaly.py                 # Hybrid physics + IsolationForest fault classifier
 │   ├── forecasting.py             # Quantile HistGradientBoosting forecaster (P10/P50/P90)
 │   ├── economics.py               # 25-yr CAPEX/OPEX cash flow, NPV, IRR, LCOE & monthly bills
-│   ├── charts.py                  # Unified Plotly interactive chart library
+│   ├── charts.py                  # Unified dark-mode CleanTech Plotly chart suite
 │   ├── exporter.py                # Excel (.xlsx), CSV & Executive HTML report builders
-│   ├── ui.py                      # Custom CSS, caching & global sidebar context
+│   ├── ui/                        # Modular UI context (__init__.py) & executive CSS (theme.py)
 │   └── views/                     # Modular Streamlit page views (6 analytical modules)
 └── tests/                         # Unit tests + Streamlit AppTest headless UI suite
 ```

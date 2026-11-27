@@ -1,4 +1,4 @@
-"""Shared Streamlit UI styling, caching wrappers, and global sidebar context."""
+"""Shared Streamlit UI context, caching wrappers, and sidebar orchestration."""
 
 from __future__ import annotations
 
@@ -24,6 +24,24 @@ from solarguard.data_loader import (
     read_uploaded_table,
 )
 from solarguard.forecasting import run_energy_forecast
+from solarguard.ui.theme import (
+    inject_custom_css,
+    render_page_banner,
+    render_section_header,
+    render_sidebar_brand,
+)
+
+__all__ = [
+    "AppContext",
+    "inject_custom_css",
+    "render_page_banner",
+    "render_section_header",
+    "render_sidebar_brand",
+    "cached_generate_telemetry",
+    "cached_detect_anomalies",
+    "cached_run_forecast",
+    "build_sidebar_and_context",
+]
 
 
 @dataclass
@@ -42,121 +60,8 @@ class AppContext:
     is_custom_upload: bool
 
 
-def inject_custom_css() -> None:
-    """Apply clean daylight engineering typography, card surfaces, and compact spacing."""
-    st.markdown(
-        """
-        <style>
-        .block-container {
-            padding-top: 1.4rem !important;
-            padding-bottom: 2.2rem !important;
-            max-width: 1440px;
-        }
-        [data-testid="stMetric"] {
-            background-color: #FFFFFF;
-            border: 1px solid #E2E8F0;
-            border-radius: 10px;
-            padding: 12px 14px;
-            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
-        }
-        [data-testid="stMetricLabel"] p {
-            font-weight: 600 !important;
-            color: #475569 !important;
-            font-size: 0.82rem !important;
-        }
-        .sg-banner {
-            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
-            color: #F8FAFC;
-            border-radius: 12px;
-            padding: 16px 22px;
-            margin-bottom: 16px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            border-left: 5px solid #F59E0B;
-        }
-        .sg-banner-title {
-            font-size: 1.28rem;
-            font-weight: 700;
-            letter-spacing: -0.01em;
-            color: #F8FAFC;
-            margin: 0;
-        }
-        .sg-banner-sub {
-            font-size: 0.86rem;
-            color: #CBD5E1;
-            margin-top: 3px;
-        }
-        .sg-pill-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        .sg-pill {
-            background: rgba(248, 250, 252, 0.10);
-            border: 1px solid rgba(248, 250, 252, 0.18);
-            color: #F8FAFC;
-            border-radius: 999px;
-            padding: 4px 11px;
-            font-size: 0.78rem;
-            font-weight: 600;
-        }
-        .sg-pill-amber {
-            background: rgba(245, 158, 11, 0.20);
-            border: 1px solid rgba(245, 158, 11, 0.45);
-            color: #FCD34D;
-        }
-        .sg-section-hdr {
-            font-size: 1.02rem;
-            font-weight: 700;
-            color: #0F172A;
-            margin: 0.4rem 0 0.2rem 0;
-            letter-spacing: -0.01em;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
-def render_page_banner(ctx: AppContext, page_title: str, subtitle: str) -> None:
-    """Render top contextual status bar with explicit HTML escaping and dark slate palette."""
-    w = WILAYAS_CATALOG.get(ctx.wilaya_key, WILAYAS_CATALOG["Oran"])
-    safe_title = html.escape(str(page_title))
-    safe_sub = html.escape(str(subtitle))
-    safe_site = html.escape(str(ctx.site_label))
-    safe_wname = html.escape(str(w.name))
-    safe_curr = html.escape(str(ctx.tariff.currency))
-    safe_sym = html.escape(str(ctx.tariff.symbol))
-    st.markdown(
-        f"""
-        <div class="sg-banner">
-            <div>
-                <div class="sg-banner-title">{safe_title}</div>
-                <div class="sg-banner-sub">{safe_sub}</div>
-            </div>
-            <div class="sg-pill-row">
-                <span class="sg-pill sg-pill-amber">{safe_site}</span>
-                <span class="sg-pill">{safe_wname} ({w.annual_ghi_kwh_m2:.0f} kWh/m²/yr)</span>
-                <span class="sg-pill">{ctx.pv_capacity_kwp:,.0f} kWp PV • {ctx.battery_capacity_kwh:,.0f} kWh ESS</span>
-                <span class="sg-pill">{safe_curr} ({safe_sym})</span>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
-def render_section_header(title: str) -> None:
-    """Render an HTML-escaped section header cleanly across Python 3.10+."""
-    st.markdown(f'<div class="sg-section-hdr">{html.escape(str(title))}</div>', unsafe_allow_html=True)
-
-
 @st.cache_data(show_spinner=False)
 def cached_generate_telemetry(preset_key: str, wilaya_key: str) -> pd.DataFrame:
-
     return generate_facility_telemetry(preset_key=preset_key, wilaya_override=wilaya_key, year=2026)
 
 
@@ -187,19 +92,23 @@ def cached_run_forecast(
 def build_sidebar_and_context() -> AppContext:
     """Render shared sidebar controls and return active dataset + computed KPIs."""
     with st.sidebar:
-        st.markdown("### ☀️ SolarGuard-DZ")
+        active_lang_hint = st.session_state.get("sg_lang") or "en"
+        render_sidebar_brand(tr(active_lang_hint, "app_subtitle"))
+
         lang = st.radio(
             "Language / Langue",
             options=["en", "fr"],
-            format_func=lambda k: "English" if k == "en" else "Français",
+            format_func=lambda k: "🇬🇧 English" if k == "en" else "🇫🇷 Français",
             horizontal=True,
             key="sg_lang",
             label_visibility="collapsed",
         )
-        st.caption(tr(lang, "app_subtitle"))
         st.divider()
 
-        st.markdown(f"**{tr(lang, 'sidebar_data_source')}**")
+        st.markdown(
+            f'<div class="sg-sb-section">{html.escape(tr(lang, "sidebar_data_source"))}</div>',
+            unsafe_allow_html=True,
+        )
         source_mode = st.radio(
             "Source Mode",
             options=["preset", "upload"],
@@ -232,7 +141,9 @@ def build_sidebar_and_context() -> AppContext:
             )
 
             full_df = cached_generate_telemetry(sel_preset_key, sel_wilaya)
-            site_label = preset.label_en.split("(")[0].strip() if lang == "en" else preset.label_fr.split("(")[0].strip()
+            site_label = (
+                preset.label_en.split("(")[0].strip() if lang == "en" else preset.label_fr.split("(")[0].strip()
+            )
             sector_label = preset.sector
             pv_kwp = preset.pv_capacity_kwp
             batt_kwh = preset.battery_capacity_kwh
@@ -335,7 +246,10 @@ def build_sidebar_and_context() -> AppContext:
                 batt_kw = 120.0
 
         st.divider()
-        st.markdown(f"**{tr(lang, 'date_window')}**")
+        st.markdown(
+            f'<div class="sg-sb-section">{html.escape(tr(lang, "date_window"))}</div>',
+            unsafe_allow_html=True,
+        )
         min_date = full_df["timestamp"].min().date()
         max_date = full_df["timestamp"].max().date()
 
@@ -384,7 +298,10 @@ def build_sidebar_and_context() -> AppContext:
                 st.caption("⚠️ Selected window has <24h in dataset; showing full dataset.")
             filtered_df = full_df
 
-        st.markdown(f"**{tr(lang, 'tariff_profile')}**")
+        st.markdown(
+            f'<div class="sg-sb-section" style="margin-top:0.55rem;">{html.escape(tr(lang, "tariff_profile"))}</div>',
+            unsafe_allow_html=True,
+        )
         tariff_keys = list(TARIFF_PROFILES.keys())
         sel_tariff_key = st.selectbox(
             "Tariff",
@@ -397,9 +314,16 @@ def build_sidebar_and_context() -> AppContext:
         )
         tariff = TARIFF_PROFILES[sel_tariff_key]
 
-        st.caption(
-            f"Active rows: **{len(filtered_df):,} h** ({filtered_df['timestamp'].min().strftime('%Y-%m-%d')} → "
-            f"{filtered_df['timestamp'].max().strftime('%Y-%m-%d')})"
+        t_start = filtered_df["timestamp"].min().strftime("%Y-%m-%d")
+        t_end = filtered_df["timestamp"].max().strftime("%Y-%m-%d")
+        st.markdown(
+            f"""
+            <div class="sg-sb-status">
+                <strong style="color:#F8FAFC;">{len(filtered_df):,} h</strong> telemetry active<br/>
+                <span style="color:#94A3B8;">{t_start} → {t_end}</span>
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
 
     kpis = compute_executive_kpis(

@@ -7,7 +7,7 @@ import streamlit as st
 from solarguard.charts import chart_cashflow_projection, chart_monthly_bills
 from solarguard.config import bi
 from solarguard.economics import compute_lifecycle_economics
-from solarguard.ui import AppContext, render_page_banner
+from solarguard.ui import AppContext, render_page_banner, render_section_header
 
 
 def render_economics_page(ctx: AppContext) -> None:
@@ -30,9 +30,12 @@ def render_economics_page(ctx: AppContext) -> None:
     sym = t.symbol
 
     with st.container(border=True):
-        st.markdown(
-            f'<div class="sg-section-hdr">{bi(lg, f"Economic & Capital Cost Assumptions ({t.currency})", f"Hypothèses Économiques & CAPEX ({t.currency})")}</div>',
-            unsafe_allow_html=True,
+        render_section_header(
+            bi(
+                lg,
+                f"Economic & Capital Cost Assumptions ({t.currency})",
+                f"Hypothèses Économiques & CAPEX ({t.currency})",
+            )
         )
         p1, p2, p3, p4, p5, p6 = st.columns(6)
         step_capex = 2000.0 if t.currency == "DZD" else 25.0
@@ -149,9 +152,8 @@ def render_economics_page(ctx: AppContext) -> None:
     col_cf, col_mb = st.columns([0.54, 0.46])
     with col_cf:
         with st.container(border=True):
-            st.markdown(
-                f'<div class="sg-section-hdr">{bi(lg, "25-Year Cumulative & Discounted Cash Flow", "Projection des Flux de Trésorerie sur 25 Ans")}</div>',
-                unsafe_allow_html=True,
+            render_section_header(
+                bi(lg, "25-Year Cumulative & Discounted Cash Flow", "Projection des Flux de Trésorerie sur 25 Ans")
             )
             st.caption(
                 bi(
@@ -164,9 +166,12 @@ def render_economics_page(ctx: AppContext) -> None:
 
     with col_mb:
         with st.container(border=True):
-            st.markdown(
-                f'<div class="sg-section-hdr">{bi(lg, "Monthly Bill Audit: Grid Baseline vs. SolarGuard", "Comparaison Mensuelle des Factures Électriques")}</div>',
-                unsafe_allow_html=True,
+            render_section_header(
+                bi(
+                    lg,
+                    "Monthly Bill Audit: Grid Baseline vs. SolarGuard",
+                    "Comparaison Mensuelle des Factures Électriques",
+                )
             )
             st.caption(
                 f"ToU Rates — Off-Peak: {t.off_peak_rate} {sym} • Shoulder: {t.shoulder_rate} {sym} • "
