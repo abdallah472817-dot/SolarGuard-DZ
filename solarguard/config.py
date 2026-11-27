@@ -1,0 +1,424 @@
+"""Domain configuration: Algerian climatic atlas, facility presets, tariffs, and i18n."""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Dict
+
+
+@dataclass(frozen=True)
+class WilayaProfile:
+    code: str
+    name: str
+    zone: str
+    lat: float
+    lon: float
+    elevation_m: int
+    annual_ghi_kwh_m2: float
+    optimal_tilt_deg: int
+    avg_temp_summer_c: float
+    avg_temp_winter_c: float
+    soiling_risk: str  # Low, Moderate, High, Extreme
+    base_soiling_rate_pct_day: float
+
+
+WILAYAS_CATALOG: Dict[str, WilayaProfile] = {
+    "Oran": WilayaProfile(
+        code="31",
+        name="Oran",
+        zone="Mediterranean Coast",
+        lat=35.697,
+        lon=-0.630,
+        elevation_m=101,
+        annual_ghi_kwh_m2=1865.0,
+        optimal_tilt_deg=31,
+        avg_temp_summer_c=27.8,
+        avg_temp_winter_c=12.4,
+        soiling_risk="Moderate",
+        base_soiling_rate_pct_day=0.14,
+    ),
+    "Algiers": WilayaProfile(
+        code="16",
+        name="Algiers (Alger)",
+        zone="Mediterranean Coast",
+        lat=36.753,
+        lon=3.058,
+        elevation_m=59,
+        annual_ghi_kwh_m2=1785.0,
+        optimal_tilt_deg=32,
+        avg_temp_summer_c=27.1,
+        avg_temp_winter_c=11.9,
+        soiling_risk="Low",
+        base_soiling_rate_pct_day=0.11,
+    ),
+    "Constantine": WilayaProfile(
+        code="25",
+        name="Constantine",
+        zone="Tell Atlas Inland",
+        lat=36.365,
+        lon=6.614,
+        elevation_m=694,
+        annual_ghi_kwh_m2=1830.0,
+        optimal_tilt_deg=32,
+        avg_temp_summer_c=28.4,
+        avg_temp_winter_c=7.8,
+        soiling_risk="Low",
+        base_soiling_rate_pct_day=0.12,
+    ),
+    "Annaba": WilayaProfile(
+        code="23",
+        name="Annaba",
+        zone="Eastern Coast",
+        lat=36.900,
+        lon=7.767,
+        elevation_m=18,
+        annual_ghi_kwh_m2=1760.0,
+        optimal_tilt_deg=31,
+        avg_temp_summer_c=26.9,
+        avg_temp_winter_c=12.1,
+        soiling_risk="Low",
+        base_soiling_rate_pct_day=0.10,
+    ),
+    "Setif": WilayaProfile(
+        code="19",
+        name="Sétif",
+        zone="High Plateaus",
+        lat=36.190,
+        lon=5.410,
+        elevation_m=1096,
+        annual_ghi_kwh_m2=1945.0,
+        optimal_tilt_deg=32,
+        avg_temp_summer_c=27.5,
+        avg_temp_winter_c=5.9,
+        soiling_risk="Moderate",
+        base_soiling_rate_pct_day=0.15,
+    ),
+    "Djelfa": WilayaProfile(
+        code="17",
+        name="Djelfa",
+        zone="Steppe / High Plateaus",
+        lat=34.670,
+        lon=3.250,
+        elevation_m=1144,
+        annual_ghi_kwh_m2=2065.0,
+        optimal_tilt_deg=30,
+        avg_temp_summer_c=29.2,
+        avg_temp_winter_c=6.2,
+        soiling_risk="High",
+        base_soiling_rate_pct_day=0.21,
+    ),
+    "Biskra": WilayaProfile(
+        code="07",
+        name="Biskra",
+        zone="Saharan Atlas Gateway",
+        lat=34.850,
+        lon=5.728,
+        elevation_m=124,
+        annual_ghi_kwh_m2=2155.0,
+        optimal_tilt_deg=30,
+        avg_temp_summer_c=35.8,
+        avg_temp_winter_c=12.5,
+        soiling_risk="High",
+        base_soiling_rate_pct_day=0.25,
+    ),
+    "Bechar": WilayaProfile(
+        code="08",
+        name="Béchar",
+        zone="Western Sahara",
+        lat=31.617,
+        lon=-2.217,
+        elevation_m=773,
+        annual_ghi_kwh_m2=2270.0,
+        optimal_tilt_deg=28,
+        avg_temp_summer_c=35.1,
+        avg_temp_winter_c=10.8,
+        soiling_risk="High",
+        base_soiling_rate_pct_day=0.27,
+    ),
+    "Ghardaia": WilayaProfile(
+        code="47",
+        name="Ghardaïa",
+        zone="Northern Sahara (M'Zab)",
+        lat=32.491,
+        lon=3.674,
+        elevation_m=469,
+        annual_ghi_kwh_m2=2290.0,
+        optimal_tilt_deg=29,
+        avg_temp_summer_c=36.3,
+        avg_temp_winter_c=11.7,
+        soiling_risk="High",
+        base_soiling_rate_pct_day=0.28,
+    ),
+    "Ouargla": WilayaProfile(
+        code="30",
+        name="Ouargla / Hassi Messaoud",
+        zone="Eastern Sahara Energy Basin",
+        lat=31.950,
+        lon=5.325,
+        elevation_m=141,
+        annual_ghi_kwh_m2=2315.0,
+        optimal_tilt_deg=28,
+        avg_temp_summer_c=37.6,
+        avg_temp_winter_c=12.2,
+        soiling_risk="Extreme",
+        base_soiling_rate_pct_day=0.33,
+    ),
+    "Adrar": WilayaProfile(
+        code="01",
+        name="Adrar",
+        zone="Grand Sud Sahara",
+        lat=27.874,
+        lon=-0.293,
+        elevation_m=263,
+        annual_ghi_kwh_m2=2465.0,
+        optimal_tilt_deg=25,
+        avg_temp_summer_c=39.4,
+        avg_temp_winter_c=13.6,
+        soiling_risk="Extreme",
+        base_soiling_rate_pct_day=0.36,
+    ),
+    "Tamanrasset": WilayaProfile(
+        code="11",
+        name="Tamanrasset",
+        zone="Hoggar Highlands",
+        lat=22.785,
+        lon=5.523,
+        elevation_m=1378,
+        annual_ghi_kwh_m2=2515.0,
+        optimal_tilt_deg=22,
+        avg_temp_summer_c=30.6,
+        avg_temp_winter_c=13.9,
+        soiling_risk="High",
+        base_soiling_rate_pct_day=0.26,
+    ),
+}
+
+
+@dataclass(frozen=True)
+class FacilityPreset:
+    key: str
+    label_en: str
+    label_fr: str
+    wilaya: str
+    sector: str
+    pv_capacity_kwp: float
+    inverter_ac_kw: float
+    battery_capacity_kwh: float
+    battery_max_kw: float
+    base_load_kw: float
+    peak_load_kw: float
+    load_profile_type: str  # industrial, commercial, hospital, microgrid, utility
+
+
+FACILITY_PRESETS: Dict[str, FacilityPreset] = {
+    "oran_industrial": FacilityPreset(
+        key="oran_industrial",
+        label_en="Oran Industrial Plant (250 kWp + 300 kWh ESS)",
+        label_fr="Usine Industrielle d'Oran (250 kWc + 300 kWh BESS)",
+        wilaya="Oran",
+        sector="Industrial Manufacturing",
+        pv_capacity_kwp=250.0,
+        inverter_ac_kw=225.0,
+        battery_capacity_kwh=300.0,
+        battery_max_kw=120.0,
+        base_load_kw=68.0,
+        peak_load_kw=235.0,
+        load_profile_type="industrial",
+    ),
+    "ghardaia_microgrid": FacilityPreset(
+        key="ghardaia_microgrid",
+        label_en="Ghardaïa Hybrid Solar Microgrid (150 kWp + 400 kWh ESS)",
+        label_fr="Micro-réseau Hybride Ghardaïa (150 kWc + 400 kWh BESS)",
+        wilaya="Ghardaia",
+        sector="Remote Microgrid / Agro-Pumping",
+        pv_capacity_kwp=150.0,
+        inverter_ac_kw=135.0,
+        battery_capacity_kwh=400.0,
+        battery_max_kw=100.0,
+        base_load_kw=28.0,
+        peak_load_kw=115.0,
+        load_profile_type="microgrid",
+    ),
+    "adrar_utility": FacilityPreset(
+        key="adrar_utility",
+        label_en="Adrar Saharan Solar Feeder (1,200 kWp + 800 kWh ESS)",
+        label_fr="Centrale Solaire d'Adrar (1 200 kWc + 800 kWh BESS)",
+        wilaya="Adrar",
+        sector="Utility / Oil & Gas Camp Feeder",
+        pv_capacity_kwp=1200.0,
+        inverter_ac_kw=1080.0,
+        battery_capacity_kwh=800.0,
+        battery_max_kw=350.0,
+        base_load_kw=260.0,
+        peak_load_kw=890.0,
+        load_profile_type="utility",
+    ),
+    "algiers_campus": FacilityPreset(
+        key="algiers_campus",
+        label_en="Algiers Tech & Office Campus (85 kWp + 120 kWh ESS)",
+        label_fr="Campus Tertiaire d'Alger (85 kWc + 120 kWh BESS)",
+        wilaya="Algiers",
+        sector="Commercial / Tertiary",
+        pv_capacity_kwp=85.0,
+        inverter_ac_kw=78.0,
+        battery_capacity_kwh=120.0,
+        battery_max_kw=50.0,
+        base_load_kw=19.0,
+        peak_load_kw=92.0,
+        load_profile_type="commercial",
+    ),
+    "constantine_hospital": FacilityPreset(
+        key="constantine_hospital",
+        label_en="Constantine Healthcare Complex (320 kWp + 500 kWh ESS)",
+        label_fr="Complexe Hospitalier Constantine (320 kWc + 500 kWh BESS)",
+        wilaya="Constantine",
+        sector="Critical Healthcare 24/7",
+        pv_capacity_kwp=320.0,
+        inverter_ac_kw=290.0,
+        battery_capacity_kwh=500.0,
+        battery_max_kw=180.0,
+        base_load_kw=115.0,
+        peak_load_kw=275.0,
+        load_profile_type="hospital",
+    ),
+}
+
+
+@dataclass(frozen=True)
+class TariffScheme:
+    key: str
+    name_en: str
+    name_fr: str
+    currency: str
+    symbol: str
+    off_peak_rate: float      # 22:30 - 06:00 (approx 23:00-06:00)
+    shoulder_rate: float      # 06:00 - 17:00 & 21:00 - 23:00
+    peak_rate: float          # 17:00 - 21:00
+    export_feed_in: float     # credit per kWh exported
+    demand_charge_per_kw_month: float
+    default_pv_capex_per_kwp: float
+    default_ess_capex_per_kwh: float
+
+
+TARIFF_PROFILES: Dict[str, TariffScheme] = {
+    "sonelgaz_mt_tou": TariffScheme(
+        key="sonelgaz_mt_tou",
+        name_en="Sonelgaz Medium-Voltage ToU (DZD)",
+        name_fr="Sonelgaz Moyenne Tension HPH/HPL (DZD)",
+        currency="DZD",
+        symbol="DA",
+        off_peak_rate=2.45,
+        shoulder_rate=4.68,
+        peak_rate=8.92,
+        export_feed_in=3.20,
+        demand_charge_per_kw_month=215.0,
+        default_pv_capex_per_kwp=118000.0,
+        default_ess_capex_per_kwh=46000.0,
+    ),
+    "sonelgaz_bt_comm": TariffScheme(
+        key="sonelgaz_bt_comm",
+        name_en="Sonelgaz Low-Voltage Commercial/Pro (DZD)",
+        name_fr="Sonelgaz Basse Tension Pro/Tertiaire (DZD)",
+        currency="DZD",
+        symbol="DA",
+        off_peak_rate=4.18,
+        shoulder_rate=5.48,
+        peak_rate=6.95,
+        export_feed_in=2.85,
+        demand_charge_per_kw_month=95.0,
+        default_pv_capex_per_kwp=125000.0,
+        default_ess_capex_per_kwh=48000.0,
+    ),
+    "intl_usd_tou": TariffScheme(
+        key="intl_usd_tou",
+        name_en="International C&I Time-of-Use (USD)",
+        name_fr="Tarif C&I International (USD)",
+        currency="USD",
+        symbol="$",
+        off_peak_rate=0.085,
+        shoulder_rate=0.135,
+        peak_rate=0.215,
+        export_feed_in=0.065,
+        demand_charge_per_kw_month=8.50,
+        default_pv_capex_per_kwp=850.0,
+        default_ess_capex_per_kwh=310.0,
+    ),
+    "med_eur_tou": TariffScheme(
+        key="med_eur_tou",
+        name_en="Euro-Med Industrial Benchmark (EUR)",
+        name_fr="Référence Industrielle Euro-Med (EUR)",
+        currency="EUR",
+        symbol="€",
+        off_peak_rate=0.105,
+        shoulder_rate=0.165,
+        peak_rate=0.255,
+        export_feed_in=0.075,
+        demand_charge_per_kw_month=9.20,
+        default_pv_capex_per_kwp=790.0,
+        default_ess_capex_per_kwh=290.0,
+    ),
+}
+
+# Algeria grid carbon intensity (kg CO2e per kWh) - natural gas combined/open cycle mix
+GRID_CO2_KG_PER_KWH: float = 0.548
+
+# Semantic color system for Solar Engineering UI
+PALETTE = {
+    "pv": "#D97706",          # Solar Amber
+    "pv_light": "#FBBF24",    # Warm Sun
+    "load": "#0284C7",        # Electrical Sky Blue
+    "grid_import": "#6366F1", # Grid Indigo
+    "grid_export": "#14B8A6", # Export Teal
+    "battery": "#059669",     # ESS Emerald
+    "anomaly": "#DC2626",     # Fault Crimson
+    "warning": "#EA580C",     # Thermal/Dust Orange
+    "slate": "#0F172A",       # Primary Ink
+    "muted": "#64748B",       # Secondary Label
+    "gridline": "#E2E8F0",    # Crisp Subtle Rule
+}
+
+
+TRANSLATIONS: Dict[str, Dict[str, str]] = {
+    "en": {
+        "app_subtitle": "Energy Analytics, Solar PV Diagnostics & Microgrid Optimization",
+        "nav_overview": "Executive Overview",
+        "nav_pv": "PV Performance & Guard",
+        "nav_load": "Load & Grid Analysis",
+        "nav_forecast": "ML Forecast & ESS Sim",
+        "nav_econ": "Financial ROI & Carbon",
+        "nav_data": "Data Studio & Export",
+        "sidebar_data_source": "Data Source & Facility",
+        "mode_preset": "Simulated DZ Facility",
+        "mode_upload": "Upload Custom CSV/XLSX",
+        "date_window": "Analysis Window",
+        "tariff_profile": "Tariff & Currency",
+        "active_site": "Active Site",
+    },
+    "fr": {
+        "app_subtitle": "Analytique Énergétique, Diagnostic Solaire PV & Optimisation Micro-réseau",
+        "nav_overview": "Vue Exécutive & Carte",
+        "nav_pv": "Performance PV & Guard",
+        "nav_load": "Analyse Charge & Réseau",
+        "nav_forecast": "Prévision IA & Sim BESS",
+        "nav_econ": "Rentabilité ROI & Carbone",
+        "nav_data": "Studio Données & Export",
+        "sidebar_data_source": "Source de Données & Site",
+        "mode_preset": "Site Algérien Simulé",
+        "mode_upload": "Importer CSV / Excel",
+        "date_window": "Période d'Analyse",
+        "tariff_profile": "Tarification & Devise",
+        "active_site": "Site Actif",
+    },
+}
+
+
+def tr(lang: str, key: str) -> str:
+    """Translate UI string for active language ('en' or 'fr')."""
+    lang_dict = TRANSLATIONS.get(lang, TRANSLATIONS["en"])
+    return lang_dict.get(key, TRANSLATIONS["en"].get(key, key))
+
+
+def bi(lang: str, en_text: str, fr_text: str) -> str:
+    """Inline bilingual selector ('fr' -> French, otherwise English)."""
+    return fr_text if lang == "fr" else en_text
+
